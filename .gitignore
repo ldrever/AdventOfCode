@@ -1,3 +1,9 @@
+# Data files
+*.dat
+
+# Used by TextPad to compile and run
+*.bat
+
 # Compiled class file
 *.class
 
