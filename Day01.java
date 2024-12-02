@@ -9,7 +9,7 @@ public class Day01 {
 	public static void main(String args[]) throws IOException {
 
 		ArrayList<String> inputLines = new ArrayList<>();
-		Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\day1input.dat"));
+		Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\day01input.dat"));
 
 		while (diskScanner.hasNext()) {
 			inputLines.add(diskScanner.nextLine());
