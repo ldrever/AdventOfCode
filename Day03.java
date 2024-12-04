@@ -95,7 +95,7 @@ public class Day03 {
 
 
 	public static void main(String args[]) throws IOException {
-		Path path = Path.of("Y:\\code\\java\\AdventOfCode\\day03input.dat");
+		Path path = Path.of("Y:\\code\\java\\AdventOfCode\\Day03input.dat");
 		String content = Files.readString(path);
 
 		String needle = "(mul\\([0-9]{1,3}\\,[0-9]{1,3}\\)|do)"; // negative values out of scope

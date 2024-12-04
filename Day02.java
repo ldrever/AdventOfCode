@@ -42,7 +42,7 @@ public class Day02 {
 	public static void main(String args[]) throws IOException {
 
 		ArrayList<String> inputLines = new ArrayList<>();
-		Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\day02input.dat"));
+		Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\Day02input.dat"));
 
 		while (diskScanner.hasNext()) {
 			inputLines.add(diskScanner.nextLine());
