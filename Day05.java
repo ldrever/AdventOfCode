@@ -8,113 +8,136 @@ import java.util.ArrayList;
 
 public class Day05 {
 
-	public static ArrayList<String> rules;
-	public static ArrayList<String> sequences;
+	public static ArrayList<String> ruleStrings;
+	public static ArrayList<String> sequenceStrings;
 
 
 
 	public static void main(String[] args) {
-		// approach will be to look at one rule, eliminate all sequences that don't comply, and then
-		// move onto the next rule. should eliminate many sequence/rule compliance checks that way
 
-		// rule-evaluation will be made easier by transforming each sequence into a hashmap, of which
-		// positions its various values occupy
+		ArrayList<NumberSequence> goodies = new ArrayList<NumberSequence>();
+		ArrayList<NumberSequence> baddies = new ArrayList<NumberSequence>();
 
 		processFile();
 
-		ArrayList<HashMap<Integer, Integer>> hashmaps = new ArrayList<HashMap<Integer, Integer>>();
-		ArrayList<HashMap<Integer, Integer>> wrongHashmaps = new ArrayList<HashMap<Integer, Integer>>();
+		for (String sequenceString : sequenceStrings) goodies.add(new NumberSequence(sequenceString));
+		for(String rule : ruleStrings) purify(rule, goodies, baddies);
 
-		for (String sequence : sequences) hashmaps.add(processSequence(sequence));
-
-
-
-		// now go through the process of looking at every rule in turn, and eliminating
-		// sequences that do not comply:
-
-		for(String rule : rules) {
-			String[] array = rule.split("\\|");
-			int first = Integer.parseInt(array[0]);
-			int last = Integer.parseInt(array[1]);
-
-			// System.out.println(first + " must come before " + last);
-
-			for(int i = hashmaps.size() - 1; i >= 0; i--) {
-				if(! doesComply(hashmaps.get(i), first, last)) {
-					//System.out.println("Removing sequence " + i + " for non-compliance with rule " + rule);
-					wrongHashmaps.add(hashmaps.get(i));
-					hashmaps.remove(i);
-
-				}
-
-			} // sequence-hashmap loop
-
-		} // rule loop
-
-		// now only valid sequence-hashmaps are left; iterate and total up their middle values
-
-		int total = 0;
-
-		for(HashMap<Integer, Integer> hashmap : hashmaps) total += hashmap.get(-1);
-
-		System.out.println("Answer to part 1: " + total);
+		System.out.println("Answer to part 1: " + part1(goodies));
+		System.out.println("Answer to part 2: " + part2(baddies));
 
 	} // main
 
 
 
-	public static boolean doesComply(HashMap<Integer, Integer> hashmap, int first, int last) {
-		//public static void doesComply(HashMap<Integer, Integer> hashmap, int first, int last) {
+	public static int part2(ArrayList<NumberSequence> sequences) {
 
-		try {
-			int firstPosition = hashmap.get(first);
-			int lastPosition = hashmap.get(last);
-			//System.out.println(first + " is at " + firstPosition + " and " + last + " is at " + lastPosition);
-			return(firstPosition < lastPosition);
-		} catch (NullPointerException e) {
-			//System.out.println("one or both values not present");
-			return true;
-		}
+		/*
+			To understand how this works, imagine a collection of boxes, each
+			containing zero or more NumberSequences.
 
-	} // doesComply
+			The first box is the one that is passed in as a parameter. The next
+			box is formed by running the "purify" function on the first box;
+			this results in only CLEAN sequences being left there, and all others
+			moved to that next box, while also being given the swapping treatment.
+
+			keep running this process until there are
+			no unclean sequences to put into a new box.
+
+			Note that at every point, the population of sequences remains
+			constant, although it's being gradually spread amongst multiple boxes.
+
+		*/
+
+		ArrayList<ArrayList<NumberSequence>> boxOfBoxes = new ArrayList<ArrayList<NumberSequence>>();
+		ArrayList<NumberSequence> currentBox = sequences;
+		int safetyCounter = 0;
+
+		do {
+			ArrayList<NumberSequence> nextBox = new ArrayList<NumberSequence>();
+
+		// now look at every rule in turn, and for
+		// sequenceStrings that do not comply, re-classify as good to bad:
+			for(String rule : ruleStrings) {
+
+				purify(rule, currentBox, nextBox);
+
+				//System.out.println("Purification via rule " + rule + " has left " + currentBox.size() + " sequences in box " + safetyCounter + "; " );
+				if (currentBox.size() == 0) break;
+			} // rule loop
+			boxOfBoxes.add(currentBox);
+			// System.out.println(currentBox.size() + " sequences in box " + safetyCounter);
+			currentBox = nextBox;
+			safetyCounter++;
+
+		} while (safetyCounter < 10000 && currentBox.size() > 0);
+
+		int middleSum = 0;
+		for(ArrayList<NumberSequence> box : boxOfBoxes) {
+			//System.out.println("next box");
+			for(NumberSequence sequence : box) {
+			//	System.out.println(sequence.getValues().toString());
+				middleSum += sequence.getMiddle();
+
+			}  // loop through the sequences in the box
+
+		} // loop through the boxes in boxOfBoxes
+
+		return middleSum;
+
+	} // part2
 
 
 
-	public static HashMap<Integer, Integer> processSequence(String sequence) {
+	public static int part1(ArrayList<NumberSequence> sequences) {
+		// approach will be to look at one rule, eliminate all sequenceStrings that don't comply, and then
+		// move onto the next rule. should eliminate many sequenceString/rule compliance checks that way
 
-		// starting with a comma-separated string of integers, return a hashmap
-		// where the FIRST value of each pair is one OF those integers, and the
-		// SECOND (lookup) value is its POSITION, starting from zero
+		// rule-evaluation will be made easier by transforming each sequenceString into a hashmap, of which
+		// positions its various values occupy
 
-		// because we'll need it later, we'll also put in a special -1 entry,
-		// whose lookup value will be the middle member of the sequence - so
-		// note that this time the actual number will be second, and -1 will be first
+		int middleSum = 0;
+		for(NumberSequence sequence : sequences) middleSum += sequence.getMiddle();
+		return middleSum;
 
-		String[] array = sequence.split(",");
-		HashMap<Integer, Integer> result = new HashMap<Integer, Integer>();
+	} // part1
 
-		for(int i = 0; i < array.length; i++) {
 
-			int value = Integer.parseInt(array[i]);
-			result.put(value, i);
 
-			// store the middle value
-			// we are placing absolute trust in the input data that every sequence has an odd-numbered length
-			if(i * 2 == array.length - 1) result.put(-1, value);
+	public static void purify(String rule, ArrayList<NumberSequence> mainList, ArrayList<NumberSequence> dirtyList) {
+		// with respect to the rule provided, this will test every NumberSequence in mainList, and
+		// LEAVE BEHIND THERE only those ones that comply with the rule.
 
-		} // for
+		// the ones that don't comply will be moved across into dirtyList (relying on pass-by-reference!)
+		// which will ALSO give them a swap-treatment, so that in future they shouldn't fail that particular rule
 
-		return result;
+		String[] array = rule.split("\\|");
+		int first = Integer.parseInt(array[0]);
+		int last = Integer.parseInt(array[1]);
 
-	} // processSequence
+		for(int i = mainList.size() - 1; i >= 0; i--) {
+			NumberSequence sequence = mainList.get(i);
+			if(! sequence.doesComply(first, last)) {
+				//System.out.print("Removing sequence " + sequence.getValues().toString() + " for non-compliance with rule " + rule);
+				sequence.swap(first, last);
+				//System.out.println(" (now in dirty pile, modified to " + sequence.getValues().toString() + ")");
+				dirtyList.add(sequence);
+				mainList.remove(i);
+
+			}
+
+		} // for i
+
+
+	} // purify
 
 
 
 	public static void processFile() {
 
 		try{
-				rules = new ArrayList<String>();
-				sequences = new ArrayList<String>();
+				ruleStrings = new ArrayList<String>();
+				sequenceStrings = new ArrayList<String>();
 				boolean isRule = true;
 				Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\Day05input.dat"));
 
@@ -125,18 +148,18 @@ public class Day05 {
 					if (line.isEmpty()) {
 						isRule = false;
 					} else if(isRule) {
-						rules.add(line);
+						ruleStrings.add(line);
 					} else {
-						sequences.add(line);
+						sequenceStrings.add(line);
 					}
 
 				}
 
-		diskScanner.close();
+				diskScanner.close();
 
-	} catch(Exception e) {
-		System.out.println("problems reading file in");
-	} // catch
+		} catch(Exception e) {
+			System.out.println("problems reading file in");
+		} // catch
 
 	} // processFile
 
