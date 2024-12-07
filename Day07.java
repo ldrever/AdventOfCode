@@ -56,26 +56,61 @@ public class Day07 {
 
 
 
-	private static boolean vectorEval(boolean debug, ArrayList<Long> nums, long subtotal, long target) {
+	private static boolean vectorEval(boolean debug, boolean isStart, boolean allowConcat, ArrayList<Long> nums, long subtotal, long target) {
 
-		if(debug) System.out.print("Now evaluating " + nums.toString()+ "; progress so far is " + subtotal + " out of " + target);
+		if(debug) System.out.println("With " + subtotal + " out of " + target + ", use " + nums.toString() + ";");
 
 		// bottom out when the vector size reaches zero
 		if(nums.size() == 0) return (subtotal == target);
 
 		// now free to presume an available next number
-		long nextNum = nums.get(0);
-		long plusTotal = subtotal + nextNum;
-		long multTotal = subtotal * nextNum;
+		int maxConcat = allowConcat ? nums.size() : 1;
+		for(int concatCount = 1; concatCount <= maxConcat; concatCount++) {
 
-		if(debug) System.out.println(" so consider " + plusTotal + " and " + multTotal);
+			long nextNum = getHead(nums, concatCount);
 
-		// recurse, as lazily as possible
-		boolean match = false;
-		if(plusTotal <= target) match = vectorEval(debug, getTail(nums, 1), plusTotal, target);
-		if(match) return true;
-		if(multTotal <= target) match = vectorEval(debug, getTail(nums, 1), multTotal, target);
-		return match;
+			// long nextNum = nums.get(0);
+
+			ArrayList<Long> tail = getTail(nums, concatCount);
+
+			if(concatCount > 1) {
+				if(debug) System.out.print("USING CONCATENATION: " + nextNum + " vs " + tail.toString() + " ");
+			}
+
+			long plusTotal = subtotal + nextNum;
+			long multTotal = subtotal * nextNum;
+
+
+			//exit the loop and return false, since wider concatenations will be even further over the target
+			if(isStart) {
+					if(plusTotal > target) break;
+			} else {
+					if(plusTotal > target && multTotal > target) break; // wondering whether the mult check can be done away with, being always greater than plus..?
+			}
+
+			if(debug) {
+				if(isStart)
+					System.out.println("so consider " + plusTotal);
+				else
+					System.out.println("so consider " + plusTotal + " and " + multTotal);
+			}
+
+
+			// recurse, as lazily as possible
+			boolean match = false;
+
+			if(plusTotal <= target) match = vectorEval(debug, false, allowConcat, tail, plusTotal, target);
+			if(match) return true;
+
+			// avoid starting with zero and multiplying that by the first number:
+			if(!isStart) {
+				if(multTotal <= target) match = vectorEval(debug, false, allowConcat, tail, multTotal, target);
+				if(match) return true;
+			}
+
+
+		}	 // loop concatCount - the break clause takes us here
+		return false;
 
 	} // nonConcatEval
 
@@ -160,7 +195,7 @@ public class Day07 {
 				//ArrayList<ArrayList<Long>> sequences = new ArrayList<ArrayList<Long>>();
 
 				Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\Day07input.dat"));
-
+				Scanner sc = new Scanner(System.in);
 				Long total = 0L;
 
 				while (diskScanner.hasNext()) {
@@ -175,8 +210,12 @@ public class Day07 {
 					long target = Long.parseLong(colonSep[0]);
 					//targets.add(target);
 					//boolean hit = part1eval(false, sequence, 1, sequence.get(0), target);
-					boolean hit = vectorEval(false, sequence, 0, target);
+					boolean hit = vectorEval(false, true, false, sequence, 0, target);
 					if(hit) total += target;
+
+					//System.out.print("Continue?");
+					//String input = sc.next();
+					//if(input.equalsIgnoreCase("N")) break;
 
 				}
 
