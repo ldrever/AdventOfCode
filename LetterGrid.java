@@ -21,6 +21,14 @@ public class LetterGrid {
 		return this.grid;
 	}
 
+	public char getCell(int row, int col) {
+		return this.grid[row][col];
+	}
+
+	public void setCell(int row, int col, char c) {
+		this.grid[row][col] = c;
+	}
+
 	public LetterGrid(String path) throws IOException {
 
 		ArrayList<char[]> inputLines = new ArrayList<char[]>();
@@ -49,6 +57,6 @@ public class LetterGrid {
 		this.height = height;
 		this.width = width;
 
-	}
+	} // constructor
 
 }
