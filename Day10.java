@@ -5,7 +5,7 @@ public class Day10 {
 
 
 
-	public static int propagate(boolean debug, LetterGrid elevations) {
+	public static int propagate(boolean debug, int part, LetterGrid elevations) {
 
 /*
 			Data structure: identify every peak, then associate every grid
@@ -23,7 +23,8 @@ public class Day10 {
 	// let's first set up those hashsets:
 	int rows = elevations.getHeight();
 	int columns = elevations.getWidth();
-	Object[][] reachables = new Object[rows][columns];
+	Object[][] peaks = new Object[rows][columns];
+
 
 	for(int row = 0; row < rows; row++) {
 		for(int column = 0; column < columns; column++) {
@@ -33,7 +34,7 @@ public class Day10 {
 				hs.add(peakText);
 				// System.out.println("Logged new peak at " + peakText);
 			}
-			reachables[row][column] = hs;
+			peaks[row][column] = hs;
 		} // column loop
 	} // row loop
 
@@ -45,7 +46,7 @@ public class Day10 {
 					// if (debug) System.out.println("cell(" + row + ", " + column + ") is at elevation " + elevation);
 
 						@SuppressWarnings("unchecked")
-						HashSet<String> upper = (HashSet<String>) reachables[row][column];
+						HashSet<String> upper = (HashSet<String>) peaks[row][column];
 						if(debug) System.out.println("Cell (" + row + "," + column + ") logs " + upper.toString());
 
 						for(int dy = -1; dy <= 1; dy++) {
@@ -59,8 +60,17 @@ public class Day10 {
 											if(debug) System.out.println(" between cells (" + row + ", " + column + ") and (" + (row + dy) + ", " + (column + dx) + ")");
 
 											@SuppressWarnings("unchecked")
-											HashSet<String> lower = (HashSet<String>) reachables[row + dy][column + dx];
-											lower.addAll(upper);
+											HashSet<String> lower = (HashSet<String>) peaks[row + dy][column + dx];
+
+											if(part == 1) {
+												lower.addAll(upper);
+											} else {
+												for(String path : upper) {
+													lower.add("(" + (row + dy) + ", " + (column + dx) + ")" + path);
+												}
+
+
+											}
 
 
 										} // small-height-change check
@@ -86,7 +96,7 @@ public class Day10 {
 				if(elevations.getCell(row, column) == BOTTOM) {
 
 					@SuppressWarnings("unchecked")
-					HashSet<String> hs = (HashSet<String>) reachables[row][column];
+					HashSet<String> hs = (HashSet<String>) peaks[row][column];
 					score += hs.size();
 					System.out.println("Valley at (" + row + "," + column + ") can reach the " + hs.size() + " peaks " + hs.toString());
 					// System.out.println("Logged new peak at " + peakText);
@@ -140,7 +150,7 @@ public class Day10 {
 		for(String s : hs) System.out.println(s);
 */
 
-		int part1score = propagate(debug, elevations);
+		int part1score = propagate(debug, 2, elevations);
 		System.out.println("Therefore score is " + part1score);
 
 	} // main method
