@@ -59,4 +59,13 @@ public class LetterGrid {
 
 	} // constructor
 
+	public void wipe(char c) {
+		for(int row = 0; row < this.getHeight(); row++) {
+			for(int column = 0; column < this.getWidth(); column++) {
+				this.setCell(row, column, c);
+			}
+		}
+
+	} // wipe method
+
 }
