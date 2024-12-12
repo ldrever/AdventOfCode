@@ -6,7 +6,7 @@ public class Day12 {
 
 
 	public static void main(String[] chars) {
-		boolean debug = false;
+		boolean debug = true;
 		String path = "Y:\\code\\java\\AdventOfCode\\Day12input.dat";
 		LetterGrid lg;
 		try {
@@ -15,7 +15,7 @@ public class Day12 {
 			System.out.println("Error processing path into LetterGrid");
 			return;
 		}
-		lg.floodFill(debug, 32, 0);
+		lg.floodFill(debug);
 
 	} // main method
 

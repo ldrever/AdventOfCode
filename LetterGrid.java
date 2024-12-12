@@ -69,7 +69,7 @@ public class LetterGrid {
 	} // wipe method
 
 
-	public void floodFill(boolean debug, int startRow, int startCol) {
+	public void floodFill(boolean debug) {
 
 /*
 	Start with a seed cell, and iteratively apply the principle that
@@ -85,94 +85,201 @@ public class LetterGrid {
 	insist on probing out all four edges of the oldest discoveries
 	first. (Hopefully this is the standard flood-fill algorithm.)
 
+	...
+
+	OK - the one-region version is working perfectly. Now to extend it
+	so that it does the entire map. We will need to ensure:
+	- already-processed regions do not get re-looked at, even though
+	  they DO need to be considered for the purpose of edge-finding
+	  and edge-counting
+	- when finishing a region, the "borderland" from its point of view
+	  needs to become the to-do list; this will eventually cover the
+	  whole map. The subsequent region though needs to remove its OWN
+	  territory from the borderland register (while extending it with its
+	  own borders with THIRD territories)
+
+	How about if we were to maintain three registers? Done, Current and
+	Future (aka borderland)?
+
+	- Start with the only cell in any register being (0,0) in Future.
+	- Start in a state of betweenRegions = true
+	- As with any moment in such a state, find the NEXT cell in
+	  Future (not possible? then we're done), flip that flag, and
+	  proceed to move that cell into the Current register
+	- Now that we're processing and NOT betweenRegions, do the standard
+	  process below, with the main difference being that anything from
+	  the Done register should NOT get flagged as Borderlands
+	- When this per-region process finishes, re-flag all Current cells
+	  as Done, and re-set betweenRegions = true
+
+... presumably want to modify from the innermost loop outwards...
 */
-		char ourChar;
-		try {
-			ourChar = this.getCell(startRow, startCol);
-		} catch (Exception e) {
-			System.out.println("No such cell exists; no action taken.");
-			return;
-		}
+		long finalScore = 0L;
+
+		ArrayList<Integer> friendlyRows = new ArrayList<Integer>();
+		ArrayList<Integer> friendlyCols = new ArrayList<Integer>();
+		int friendlyCount = 0;
+
+		ArrayList<Integer> foreignRows = new ArrayList<Integer>();
+		ArrayList<Integer> foreignCols = new ArrayList<Integer>();
+		int foreignCount = 0;
+
+		ArrayList<Integer> frontierRows = new ArrayList<Integer>();
+		ArrayList<Integer> frontierCols = new ArrayList<Integer>();
+		frontierRows.add(0);
+		frontierCols.add(0);
+		int frontierCount = 1;
 
 
-		ArrayList<Integer> borderlandRows = new ArrayList<Integer>();
-		ArrayList<Integer> borderlandCols = new ArrayList<Integer>();
-		int borderlandCount = 0;
+		// outer loop: are there any frontier cells left to process?
+		while(frontierCount > 0)
+		{
 
-		ArrayList<Integer> ourRows = new ArrayList<Integer>();
-		ArrayList<Integer> ourCols = new ArrayList<Integer>();
-		ourRows.add(startRow);
-		ourCols.add(startCol);
-		int ourCount = 1;
+			//  change first frontier cell to a friendly
+			int startRow = frontierRows.get(0);
+			int startCol = frontierCols.get(0);
 
-		int edgeCount = 0;
+			friendlyRows.add(startRow);
+			friendlyCols.add(startCol);
+			friendlyCount++;
 
-		for(int cell = 0; cell < ourCount; cell++) {
-			for(int dy = -1; dy <= 1; dy++) {
-				for(int dx = -1; dx <= 1; dx++) {
-					if(Math.abs(dx) + Math.abs(dy) != 1) continue; // move in precisely one direction
-					try {
-						int newRow = ourRows.get(cell) + dy;
-						int newCol = ourCols.get(cell) + dx;
-						char newChar = this.getCell(newRow, newCol);
+			frontierRows.remove(0);
+			frontierCols.remove(0);
+			frontierCount--;
 
-						if(newChar == ourChar) {
-							boolean alreadyNoted = false;
-							// scenario 1: friendly neighbour, already known to be part of our region
-							for(int check = 0; check < ourCount; check++) {
-								if(ourRows.get(check) == newRow && ourCols.get(check) == newCol) {
-									alreadyNoted = true;
-									break;
+			char friendlyChar = this.getCell(startRow, startCol);
+			int edgeCount = 0;
+
+			// inner loop: are there any friendly cells left to process?
+			// unlike frontier cells, we don't eliminate them as we process
+			// them, so here, we just count up from zero, trusting that new
+			// ones are added to the end, and will eventually get processed
+			for(int cell = 0; cell < friendlyCount; cell++) {
+
+				// handle all four of the current friendly cell's NEIGHBOURS:
+				for(int dy = -1; dy <= 1; dy++) {
+
+					nextNeighbour:
+					for(int dx = -1; dx <= 1; dx++) {
+						if(Math.abs(dx) + Math.abs(dy) != 1) continue nextNeighbour; // move in precisely one direction
+
+						try {
+							int newRow = friendlyRows.get(cell) + dy;
+							int newCol = friendlyCols.get(cell) + dx;
+							char newChar = this.getCell(newRow, newCol);
+
+
+
+							// scenario A - registered friend: nothing to do
+							for(int check = 0; check < friendlyCount; check++) {
+								if(friendlyRows.get(check) == newRow && friendlyCols.get(check) == newCol) {
+									continue nextNeighbour;
 								}
-							} // check loop
+							} // friend check loop
 
-							// scenario 2: friendly neighbour, encountered for the first time
-							if(!alreadyNoted) {
-								ourRows.add(newRow);
-								ourCols.add(newCol);
-								ourCount++;
-								if(debug) System.out.println("Logged " + ourCount + "th friendly neighbour at (" + newRow + "," + newCol + ")");
+
+
+							// scenario B - registered foreigner: just note the edge and move on
+							for(int check = 0; check < foreignCount; check++) {
+								if(foreignRows.get(check) == newRow && foreignCols.get(check) == newCol) {
+									edgeCount++;
+									continue nextNeighbour;
+								}
+
+							} // foreign check loop
+
+
+
+							// scenario C - registered frontier: evaluate it for friendliness,
+							// and either transfer it to that register if so, OR note the edge
+							for(int check = 0; check < frontierCount; check++) {
+								if(frontierRows.get(check) == newRow && frontierCols.get(check) == newCol) {
+
+									if(newChar == friendlyChar) {
+
+										friendlyRows.add(newRow);
+										friendlyCols.add(newCol);
+										friendlyCount++;
+
+										frontierRows.remove(check);
+										frontierCols.remove(check);
+										frontierCount--;
+
+									} else {
+										edgeCount++;
+									}
+
+									continue nextNeighbour;
+								}
+
+							} // frontier check loop
+
+
+							// if we've reached here -
+							// scenario D - new cell not in any register: evaluate it, and
+							// add as friend or frontier accordingly
+
+							if(newChar == friendlyChar) {
+								friendlyRows.add(newRow);
+								friendlyCols.add(newCol);
+								friendlyCount++;
+							} else {
+								frontierRows.add(newRow);
+								frontierCols.add(newCol);
+								frontierCount++;
+
+								edgeCount++;
 							}
 
-						} else {
+						} catch (Exception e) {
+							// scenario E - edge of the map: just capture the edge
 							edgeCount++;
+						} // try-catch
 
-							// do to the borderland what we already did for our lands
-							// FIXME pull out to a function, that both use? boolean on whether to up its count?
+					} // dx loop
+				} // dy loop
+			} // inner friendly cell loop
 
-							boolean alreadyNoted = false;
-							// scenario 3: cross-border neighbour, already known
-							for(int check = 0; check < borderlandCount; check++) {
-								if(borderlandRows.get(check) == newRow && borderlandCols.get(check) == newCol) {
-									alreadyNoted = true;
-									break;
-								}
-							} // check loop
+			// NICE TO HAVE only do this when they touch the border...
 
-							// scenario 4: cross-border neighbour, encountered for the first time
-							if(!alreadyNoted) {
-								borderlandRows.add(newRow);
-								borderlandCols.add(newCol);
-								borderlandCount++;
-							}
 
-						}
-					} catch (Exception e) {
-						// scenario 5: edge of the map
-						edgeCount++;
-					} // try-catch
-				} // dx loop
-			} // dy loop
-		} // cell loop
+			// summarize region
+			System.out.println("The '" + friendlyChar + "' region including (" + startRow + "," + startCol + ") has " + friendlyCount + " cells and " + edgeCount + " edges.");
+			System.out.println("HENCE *ITS* SCORE IS " + edgeCount * friendlyCount);
+			System.out.println("(There are now " + frontierCount + " frontier cells.)");
+			System.out.println();
+			finalScore += edgeCount * friendlyCount;
 
-		System.out.println("The '" + ourChar + "' region including (" + startRow + "," + startCol + ") has " + ourCount + " cells and " + edgeCount + " edges.");
-		System.out.println("(" + borderlandCount + " bordering cells.)");
-		System.out.println();
-		System.out.println("HENCE ITS SCORE IS " + edgeCount * ourCount);
+			// bulk-move all friendlies to foreign
+			// NICE TO HAVE - faster if non-interior cells skup...
+			for(int i = 0; i < friendlyCount; i++) {
+				foreignRows.add(friendlyRows.get(i));
+				foreignCols.add(friendlyCols.get(i));
+				foreignCount++;
+			} // bulk-move loop
+
+			friendlyRows.clear();
+			friendlyCols.clear();
+			friendlyCount = 0;
+
+
+/*
+
+			Scanner sc = new Scanner(System.in);
+			System.out.print("Continue?");
+			String input = sc.next();
+			sc.close();
+			if(input.equalsIgnoreCase("N")) return;
+
+*/
+
+		} // while(frontierCount > 0)
+
+		System.out.println("Final score: " + finalScore);
 
 // maybe a shouldIModify flag? or just return an altered map?
 
-// might want to return an AL of its "borderland"
+// might want to return an AL of its "frontier"
 
 	} // floodFill method
 }
