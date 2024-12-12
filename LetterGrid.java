@@ -69,7 +69,7 @@ public class LetterGrid {
 	} // wipe method
 
 
-	public void floodFill(boolean debug) {
+	public void floodFill(boolean debug, ArrayList<Area> areaList) {
 
 /*
 	Start with a seed cell, and iteratively apply the principle that
@@ -114,7 +114,6 @@ public class LetterGrid {
 
 ... presumably want to modify from the innermost loop outwards...
 */
-		long finalScore = 0L;
 
 		ArrayList<Integer> friendlyRows = new ArrayList<Integer>();
 		ArrayList<Integer> friendlyCols = new ArrayList<Integer>();
@@ -129,7 +128,6 @@ public class LetterGrid {
 		frontierRows.add(0);
 		frontierCols.add(0);
 		int frontierCount = 1;
-
 
 		// outer loop: are there any frontier cells left to process?
 		while(frontierCount > 0)
@@ -148,6 +146,13 @@ public class LetterGrid {
 			frontierCount--;
 
 			char friendlyChar = this.getCell(startRow, startCol);
+
+			Area friendlyArea = new Area(startRow, startCol, friendlyChar);
+
+			areaList.add(friendlyArea);
+
+			int areaIndex = areaList.size() - 1;
+
 			int edgeCount = 0;
 
 			// inner loop: are there any friendly cells left to process?
@@ -155,6 +160,8 @@ public class LetterGrid {
 			// them, so here, we just count up from zero, trusting that new
 			// ones are added to the end, and will eventually get processed
 			for(int cell = 0; cell < friendlyCount; cell++) {
+				int cellRow = friendlyRows.get(cell);
+				int cellCol = friendlyCols.get(cell);
 
 				// handle all four of the current friendly cell's NEIGHBOURS:
 				for(int dy = -1; dy <= 1; dy++) {
@@ -164,8 +171,8 @@ public class LetterGrid {
 						if(Math.abs(dx) + Math.abs(dy) != 1) continue nextNeighbour; // move in precisely one direction
 
 						try {
-							int newRow = friendlyRows.get(cell) + dy;
-							int newCol = friendlyCols.get(cell) + dx;
+							int newRow = cellRow + dy;
+							int newCol = cellCol + dx;
 							char newChar = this.getCell(newRow, newCol);
 
 
@@ -183,6 +190,8 @@ public class LetterGrid {
 							for(int check = 0; check < foreignCount; check++) {
 								if(foreignRows.get(check) == newRow && foreignCols.get(check) == newCol) {
 									edgeCount++;
+									friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+
 									continue nextNeighbour;
 								}
 
@@ -207,6 +216,7 @@ public class LetterGrid {
 
 									} else {
 										edgeCount++;
+										friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
 									}
 
 									continue nextNeighbour;
@@ -229,11 +239,14 @@ public class LetterGrid {
 								frontierCount++;
 
 								edgeCount++;
+								friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
 							}
 
 						} catch (Exception e) {
-							// scenario E - edge of the map: just capture the edge
+							// scenario E - edge of the map
 							edgeCount++;
+							friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+
 						} // try-catch
 
 					} // dx loop
@@ -244,11 +257,15 @@ public class LetterGrid {
 
 
 			// summarize region
-			System.out.println("The '" + friendlyChar + "' region including (" + startRow + "," + startCol + ") has " + friendlyCount + " cells and " + edgeCount + " edges.");
-			System.out.println("HENCE *ITS* SCORE IS " + edgeCount * friendlyCount);
-			System.out.println("(There are now " + frontierCount + " frontier cells.)");
-			System.out.println();
-			finalScore += edgeCount * friendlyCount;
+			friendlyArea.setBlocks(friendlyCount);
+			friendlyArea.setEdgeSegments(edgeCount);
+
+			if(debug) {
+				System.out.println("The '" + friendlyChar + "' region including (" + startRow + "," + startCol + ") has " + friendlyCount + " cells and " + edgeCount + " edges.");
+				System.out.println("HENCE *ITS* SCORE IS " + friendlyArea.edgeScore());
+				System.out.println("(There are now " + frontierCount + " frontier cells.)");
+				System.out.println();
+			}
 
 			// bulk-move all friendlies to foreign
 			// NICE TO HAVE - faster if non-interior cells skup...
@@ -275,11 +292,34 @@ public class LetterGrid {
 
 		} // while(frontierCount > 0)
 
-		System.out.println("Final score: " + finalScore);
+
 
 // maybe a shouldIModify flag? or just return an altered map?
 
 // might want to return an AL of its "frontier"
 
 	} // floodFill method
+
+
+	public LetterGrid (boolean debug, LetterGrid interior, char defaultChar) {
+		// surround the input LetterGrid with a one-character border to return
+		// a new one that is 2 rows and 2 columns larger
+
+		this.height = 2 + interior.getHeight();
+		this.width = 2 + interior.getWidth();
+
+		this.grid = new char[this.height][this.width];
+
+		for(int row = 0; row < this.height; row++) {
+			for(int col = 0; col < this.width; col++) {
+
+				if(row == 0 || col == 0 || row + 1 == this.height|| col + 1 == this.width ) {
+					this.setCell(row, col, defaultChar);
+				} else {
+					this.setCell(row, col, interior.getCell(row - 1, col - 1));
+				}
+			}
+		}
+
+	} // surround constructor
 }
