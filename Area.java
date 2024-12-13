@@ -70,14 +70,31 @@ public class Area {
 		ArrayList<Path> loopSet = new ArrayList<Path>();
 
 		// outermost while-loop, because we might have SOME loops, but do we have ALL loops?
+		int innerloop = 0;
 		while(boundary.size() > 0)
 		{
+			innerloop++;
+			int outerloop = 0;
 			do { // inner do-loop, because we can't trust that the paths come to us in the right order to append
 				 // so have to iterate indefinitely, trusting that eventually the first path will be a loop
-
+				outerloop++;
 				Path p0 = this.boundary.get(0);
+				boolean connected = false;
+
 				if(debug) System.out.print("Next pass in making forward joins to path ");
 				if(debug) p0.display();
+
+				if( outerloop + innerloop > 30000) debug = true;
+				if(debug) {
+					Scanner sc = new Scanner(System.in);
+					System.out.println("go?");
+					String input = sc.next();
+					if(input.equalsIgnoreCase("N")) return;
+				}
+
+
+				ArrayList<Path> lefties = new ArrayList<Path>();
+				boolean allowLeftTurns = false;
 
 				for(int i = this.boundary.size() - 1; i > 0; i--) {
 
@@ -85,15 +102,45 @@ public class Area {
 					//if(debug) System.out.print("Trying out path ");
 					//if(debug) p1.display();
 
-					if(p0.attemptForwardsJoin(debug, p1)) {
+					String result = p0.attemptJoin(debug, allowLeftTurns, p1);
 
+					if(result.equals("OTHER JOIN")) {
 						boundary.remove(i);
 						if(debug) System.out.println("Path " + i + " was successfully joined on.");
-
+						connected = true;
+						break;
 					}
 
+					if(result.equals("LEFT JOIN")) {
+						lefties.add(p1);
+						boundary.remove(i);
+						if(debug) System.out.println("Path " + i + " (a left join) deferred.");
+
+					}
+				} // for i loop
+
+
+
+				if(!connected) {
+					allowLeftTurns = true;
+					for(int j = lefties.size() - 1; j >= 0; j--) {
+						Path p1 = lefties.get(j);
+
+						String result = p0.attemptJoin(debug, allowLeftTurns, p1);
+						if(result.equals("LEFT JOIN")) {
+							lefties.remove(j);
+							if(debug) System.out.println("Left-turning path " + j + " was successfully joined on.");
+						}
+
+					}
 				}
 
+				// trusting that SOMETHING has been added on, now need to empty lefties back into boundary
+				// ready for the next joinment
+				for(int k = 0; k < lefties.size(); k++) {
+					boundary.add(lefties.get(k));
+					lefties.remove(k);
+				}
 			} // inner do loop
 
 			while(!this.boundary.get(0).isLoop());

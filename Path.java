@@ -76,6 +76,69 @@ public class Path {
 	} // isLoop method
 
 
+
+	public String attemptJoin(boolean debug, boolean allowLeftTurns, Path p2) {
+
+		String result = "OTHER JOIN";
+		if(debug) System.out.print("Checking whether path ");
+		if(debug) p2.display();
+		if(debug) System.out.println(" can follow on from path ");
+		if(debug) this.display();
+		if(debug) System.out.println(" Result:");
+
+		ArrayList<Integer> p2Rows = p2.getRows();
+		ArrayList<Integer> p2Cols = p2.getCols();
+
+		int dy = this.rows.get(this.rows.size() - 1) - this.rows.get(this.rows.size() - 2);
+		int dx = this.cols.get(this.cols.size() - 1) - this.cols.get(this.cols.size() - 2);
+
+		int oldClockDirection = 0;
+		if(dy == -1) oldClockDirection = 12;
+		if(dx == 1) oldClockDirection = 3;
+		if(dy == 1) oldClockDirection = 6;
+		if(dx == -1) oldClockDirection = 9;
+
+		if(this.rows.get(this.rows.size() - 1) == p2Rows.get(0)) {
+			if(this.cols.get(this.cols.size() - 1) == p2Cols.get(0)) {
+
+				dy = p2Rows.get(1) - p2Rows.get(0);
+				dx = p2Cols.get(1) - p2Cols.get(0);
+
+				int newClockDirection = 0;
+				if(dy == -1) newClockDirection = 12;
+				if(dx == 1) newClockDirection = 3;
+				if(dy == 1) newClockDirection = 6;
+				if(dx == -1) newClockDirection = 9;
+
+				boolean permissionToExecute = true;
+				if((12 + oldClockDirection - 3) % 12 == newClockDirection % 12) {
+					if(debug) System.out.println("***** LEFT TURN DETECTED *****");
+					permissionToExecute = allowLeftTurns;
+					result = "LEFT JOIN";
+
+				}
+
+				if(permissionToExecute) {
+
+					for(int i = 1; i < p2Rows.size(); i++) { // start from 1 not 0, since 0 is a repeat of this's end-point
+						this.rows.add(p2Rows.get(i));
+						this.cols.add(p2Cols.get(i));
+
+					}
+					if(debug) System.out.println(" success");
+
+				} // permissionToExecute check
+
+				return result;
+			}
+
+		}
+		if(debug) System.out.println(" failure");
+		return "NO JOIN";
+
+	} // attemptJoin method
+
+
 	public boolean attemptForwardsJoin(boolean debug, Path p2) {
 
 		boolean result = false;
