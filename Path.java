@@ -37,6 +37,31 @@ public class Path {
 
 
 
+	public int countCorners() {
+
+		int result = 0;
+
+		for(int currentIndex = 0; currentIndex < this.rows.size(); currentIndex++) {
+
+			// pre-adding the size prevents the modulus operator from returning a negative
+			int prevIndex = (this.rows.size() + currentIndex - 1) % this.rows.size();
+			int nextIndex = (this.rows.size() + currentIndex + 1) % this.rows.size();
+
+			boolean prevHoriz = (this.rows.get(prevIndex) == this.rows.get(currentIndex));
+			boolean nextHoriz = (this.rows.get(currentIndex) == this.rows.get(nextIndex));
+
+			// XOR the horizontality going in and out of a given vertex - it's
+			// a corner if precisely one of the edges is horizontal
+			if(prevHoriz ^ nextHoriz) result++;
+
+		} // currentIndex loop
+
+		return result;
+
+	} // countCorners method
+
+
+
 	public boolean isLoop() {
 		// note that there is never an act of "tying the knot"; a path is
 		// assumed to be a loop if it has the same point for a head and tail

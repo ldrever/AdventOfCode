@@ -12,6 +12,12 @@ public class Area {
 
 	ArrayList<Path> boundary;
 
+	public String homeString() {
+		String result = "";
+		result += "(" + this.homeCellRow + "," + this.homeCellCol + ")";
+		return result;
+	}
+
 	public char getAllegiance() {
 		return this.allegiance;
 	}
@@ -29,7 +35,13 @@ public class Area {
 	}
 
 	public int edgeScore() {
+
 		return this.blockCount * this.edgeSegmentCount;
+	}
+
+	public int sideScore(boolean debug) {
+		if(debug) System.out.println(this.blockCount + " blocks and " + this.sideCount + " sides.");
+		return this.blockCount * this.sideCount;
 	}
 
 
@@ -70,10 +82,15 @@ public class Area {
 				for(int i = this.boundary.size() - 1; i > 0; i--) {
 
 					Path p1 = this.boundary.get(i);
-					if(debug) System.out.print("Trying out path ");
-					if(debug) p1.display();
+					//if(debug) System.out.print("Trying out path ");
+					//if(debug) p1.display();
 
-					if(p0.attemptForwardsJoin(debug, p1)) boundary.remove(i);
+					if(p0.attemptForwardsJoin(debug, p1)) {
+
+						boundary.remove(i);
+						if(debug) System.out.println("Path " + i + " was successfully joined on.");
+
+					}
 
 				}
 
@@ -88,7 +105,25 @@ public class Area {
 	// boundary will be empty at this point
 	this.boundary = loopSet;
 
-	} // tieLoops method
+	} // getLoops method
+
+
+
+	public void processLoops(boolean debug) {
+		this.sideCount = 0;
+		if(debug) System.out.println("Boundary includes " + boundary.size() + " paths.");
+		// trusting that the boundary is already a small number of loops at this point
+		for(Path path : boundary) {
+			this.sideCount += path.countCorners();
+			if(debug) System.out.print("Counted " + path.countCorners() + " corners in path ");
+			if(debug) path.display();
+			System.out.println();
+
+
+		}
+
+
+	} // processLoops method
 
 
 
