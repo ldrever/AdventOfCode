@@ -20,9 +20,21 @@ public class Day12 {
 		lg.floodFill(debug, areaList);
 
 		int score = 0;
-		for(Area area : areaList) score += area.edgeScore();
+		for(Area area : areaList) {
+			score += area.edgeScore();
+			System.out.print("area : " + area.getAllegiance() + " paths: ");
+			area.displayPaths();
+			System.out.println();
+			area.getLoops(debug);
+			System.out.print("after looping - area : " + area.getAllegiance() + " paths: ");
+			area.displayPaths();
+			System.out.println();
 
-		System.out.println("Areal summation: " + score);
+
+
+			System.out.println("Areal summation: " + score);
+
+		}
 
 		// FIXME ok so check that we have areas with all paths; then proceed PER TEB to tie those paths together...
 
