@@ -73,16 +73,15 @@ public class Area {
 		ArrayList<Path> loopSet = new ArrayList<Path>();
 
 		// outermost while-loop, because we might have SOME loops, but do we have ALL loops?
-		int innerloop = 0;
+		int outerloop = 0;
 		while(boundary.size() > 0)
 		{
 
-
-			innerloop++;
-			int outerloop = 0;
-			do { // inner do-loop, because we can't trust that the paths come to us in the right order to append
+			outerloop++;
+			int innerloop = 0;
+			do { // inner do-loop, because we can't trust that the arrows come to us in the right order to append
 				 // so have to iterate indefinitely, trusting that eventually the first path will be a loop
-				outerloop++;
+				innerloop++;
 
 				if(debug) {
 					System.out.print("boundary zero: ");
@@ -140,6 +139,8 @@ public class Area {
 
 					if(result.equals("LEFT JOIN")) {
 						lefties.add(p1);
+						System.out.println("trying to remove item " + i + " of " + boundary.size());
+
 						boundary.remove(i);
 						if(debug) System.out.println("Path " + i + " (a left join) deferred.");
 
@@ -164,7 +165,7 @@ public class Area {
 
 				// trusting that SOMETHING has been added on, now need to empty lefties back into boundary
 				// ready for the next joinment
-				for(int k = 0; k < lefties.size(); k++) {
+				for(int k = lefties.size() - 1; k >= 0; k--) {
 					boundary.add(lefties.get(k));
 					lefties.remove(k);
 				}

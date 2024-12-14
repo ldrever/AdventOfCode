@@ -190,7 +190,7 @@ public class LetterGrid {
 							for(int check = 0; check < foreignCount; check++) {
 								if(foreignRows.get(check) == newRow && foreignCols.get(check) == newCol) {
 									edgeCount++;
-									friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+									friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 
 									continue nextNeighbour;
 								}
@@ -216,7 +216,7 @@ public class LetterGrid {
 
 									} else {
 										edgeCount++;
-										friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+										friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 									}
 
 									continue nextNeighbour;
@@ -239,13 +239,13 @@ public class LetterGrid {
 								frontierCount++;
 
 								edgeCount++;
-								friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+								friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 							}
 
 						} catch (Exception e) {
 							// scenario E - edge of the map
 							edgeCount++;
-							friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+							friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 
 						} // try-catch
 

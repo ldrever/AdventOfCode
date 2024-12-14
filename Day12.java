@@ -6,7 +6,7 @@ public class Day12 {
 
 
 	public static void main(String[] chars) {
-		boolean debug = false;
+		boolean debug = true;
 		String path = "Y:\\code\\java\\AdventOfCode\\Day12small.dat";
 		LetterGrid lg;
 		ArrayList<Area> areaList = new ArrayList<Area>();
