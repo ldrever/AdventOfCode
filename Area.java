@@ -3,15 +3,15 @@ import java.io.*;
 
 public class Area {
 
-	int homeCellRow;
-	int homeCellCol;
-	char allegiance;
+	private volatile int homeCellRow;
+	private volatile int homeCellCol;
+	private volatile char allegiance;
 
-	int blockCount;
-	int edgeSegmentCount;
-	int sideCount;
+	private volatile int blockCount;
+	private volatile int edgeSegmentCount;
+	private volatile int sideCount;
 
-	ArrayList<Path> boundary;
+	private volatile ArrayList<Path> boundary;
 
 	public synchronized String homeString() {
 		String result = "";

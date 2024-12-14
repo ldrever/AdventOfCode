@@ -12,10 +12,10 @@ public class Path {
 	// to its top left
 
 	// the number of path segments is one less than the size of these:
-	private ArrayList<Integer> rows;
-	private ArrayList<Integer> cols;
-	private String initialDirection;
-	private LetterGrid parentGrid;
+	private volatile ArrayList<Integer> rows;
+	private volatile ArrayList<Integer> cols;
+	private volatile String initialDirection;
+	private volatile LetterGrid parentGrid;
 
 	public synchronized LetterGrid getParentGrid() {
 		return this.parentGrid;
@@ -99,6 +99,10 @@ public class Path {
 		this.rows.add(endRow);
 		this.cols.add(endCol);
 
+
+		this.addPoint(startRow, startCol);
+		this.addPoint(endRow, endCol);
+
 		//System.out.println("Imaginary path used: " + this.toString());
 
 	}
@@ -112,28 +116,49 @@ public class Path {
 		System.out.print("countCorners has started at 0...");
 		System.out.println(this.toString());
 
+			@SuppressWarnings("unchecked")
+		ArrayList<Integer>	myRows = (ArrayList<Integer>) this.rows.clone();
+
+			@SuppressWarnings("unchecked")
+		ArrayList<Integer>	myCols = (ArrayList<Integer>) this.cols.clone();
+
+			int size = myRows.size();
 
 
-		for(int currentIndex = 0; currentIndex < this.rows.size(); currentIndex++) {
-			System.out.println(result + "at index " + currentIndex);
-			// pre-adding the size prevents the modulus operator from returning a negative
-			int prevIndex = (this.rows.size() + currentIndex - 1) % this.rows.size();
-			int nextIndex = (this.rows.size() + currentIndex + 1) % this.rows.size();
 
-			int horizCount = 0;
-			if (this.rows.get(prevIndex) == this.rows.get(currentIndex)) horizCount++;
-			if (this.rows.get(currentIndex) == this.rows.get(nextIndex)) horizCount++;
+			// zeroth point is a repeat of the last point, so ignore it, and
+			// ensure that size is adjusted down by when when working out
+			// modulus results
 
-			// XOR the horizontality going in and out of a given vertex - it's
-			// a corner if precisely one of the edges is horizontal
-			if(horizCount == 1) {
+			for(int currentIndex = 1; currentIndex < size; currentIndex++) {
+				System.out.println(result + "at index " + currentIndex);
+				// pre-adding the size prevents the modulus operator from returning a negative
+				int prevIndex = ((size - 1) + currentIndex - 1) % (size - 1);
+				int nextIndex = ((size - 1) + currentIndex + 1) % (size - 1);
 
-				result++;
+				String showme = "Evaluating cornerity of (" + myRows.get(prevIndex) + "," + myCols.get(prevIndex) + ")->("+myRows.get(currentIndex)+","+myCols.get(currentIndex)+") vs "
+														+ "(" + myRows.get(currentIndex)+","+myCols.get(currentIndex) + ")->("+myRows.get(nextIndex)+","+myCols.get(nextIndex)+") vs ";
 
 
-			}
+				System.out.println(showme);
 
-		} // currentIndex loop
+				int horizCount = 0;
+				if (myRows.get(prevIndex) == myRows.get(currentIndex)) horizCount++;
+				if (myRows.get(currentIndex) == myRows.get(nextIndex)) horizCount++;
+
+				// XOR the horizontality going in and out of a given vertex - it's
+				// a corner if precisely one of the edges is horizontal
+				if(horizCount == 1) {
+
+					result++;
+
+
+				}
+
+			} // currentIndex loop
+
+
+
 		System.out.println("and finished at " + result);
 		return result;
 
@@ -437,10 +462,8 @@ public class Path {
 			arrowEndCol++;
 		}
 
-		this.rows.add(arrowStartRow);
-		this.rows.add(arrowEndRow);
-		this.cols.add(arrowStartCol);
-		this.cols.add(arrowEndCol);
+		this.addPoint(arrowStartRow, arrowStartCol);
+		this.addPoint(arrowEndRow, arrowEndCol);
 
 	}
 

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class LetterGrid {
 
-	private int height, width;
-	private char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
+	private volatile int height, width;
+	private volatile char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
 
 	public synchronized int getHeight() {
 		return this.height;
