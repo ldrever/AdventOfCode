@@ -57,11 +57,14 @@ public class Area {
 		this.boundary.add(path);
 	}
 
-	public void displayPaths() {
-		for(Path path : boundary) {
-			path.display();
-		}
-	} // displayPath method
+
+
+	public String toString() {
+		String result = "";
+		for(Path path : boundary) result += path.toString();
+		return result;
+	} // toString method
+
 
 
 	public void getLoops(boolean debug) {
@@ -73,18 +76,31 @@ public class Area {
 		int innerloop = 0;
 		while(boundary.size() > 0)
 		{
+
+
 			innerloop++;
 			int outerloop = 0;
 			do { // inner do-loop, because we can't trust that the paths come to us in the right order to append
 				 // so have to iterate indefinitely, trusting that eventually the first path will be a loop
 				outerloop++;
+
+				if(debug) {
+					System.out.print("boundary zero: ");
+					System.out.print(boundary.get(0).toString());
+					System.out.println();
+					System.out.println("rest of boundary: ");
+					for(int b = 1; b < boundary.size(); b++) {
+						System.out.print(boundary.get(b).toString());
+					}
+				}
+
+
+
 				Path p0 = this.boundary.get(0);
 				boolean connected = false;
 
-				if(debug) System.out.print("Next pass in making forward joins to path ");
-				if(debug) p0.display();
 
-				if( outerloop + innerloop > 30000) debug = true;
+				//if( outerloop + innerloop > 44) debug = true;
 				if(debug) {
 					Scanner sc = new Scanner(System.in);
 					System.out.println("go?");
@@ -100,7 +116,15 @@ public class Area {
 
 					Path p1 = this.boundary.get(i);
 					//if(debug) System.out.print("Trying out path ");
-					//if(debug) p1.display();
+					//if(debug) System.out.print(p1.toString());
+
+					if(p1.toString().equals("(1,128)->(2,128)")) debug = true;
+									if(debug) {
+										Scanner sc = new Scanner(System.in);
+										System.out.println("go?");
+										String input = sc.next();
+										if(input.equalsIgnoreCase("N")) return;
+					}
 
 					String result = p0.attemptJoin(debug, allowLeftTurns, p1);
 
@@ -163,7 +187,7 @@ public class Area {
 		for(Path path : boundary) {
 			this.sideCount += path.countCorners();
 			if(debug) System.out.print("Counted " + path.countCorners() + " corners in path ");
-			if(debug) path.display();
+			if(debug) System.out.print(path.toString());
 			System.out.println();
 
 

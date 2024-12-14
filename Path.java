@@ -26,13 +26,14 @@ public class Path {
 	}
 
 
-	public void display() {
+
+	public String toString() {
+		String result = "";
 		for(int i = 0; i < rows.size(); i++) {
-			System.out.print((i == 0 ? "" : "->") + "(" + rows.get(i) + "," + cols.get(i) + ")");
+			result += ((i == 0 ? "" : "->") + "(" + rows.get(i) + "," + cols.get(i) + ")");
 
 		}
-		System.out.print(";");
-
+		return result;
 	}
 
 
@@ -81,9 +82,9 @@ public class Path {
 
 		String result = "OTHER JOIN";
 		if(debug) System.out.print("Checking whether path ");
-		if(debug) p2.display();
+		if(debug) System.out.print(p2.toString());
 		if(debug) System.out.println(" can follow on from path ");
-		if(debug) this.display();
+		if(debug) System.out.print(this.toString());
 		if(debug) System.out.println(" Result:");
 
 		ArrayList<Integer> p2Rows = p2.getRows();
@@ -143,9 +144,9 @@ public class Path {
 
 		boolean result = false;
 		if(debug) System.out.print("Checking whether path ");
-		if(debug) p2.display();
+		if(debug) System.out.print(p2.toString());
 		if(debug) System.out.println(" can follow on from path ");
-		if(debug) this.display();
+		if(debug) System.out.print(this.toString());
 		if(debug) System.out.println(" Result:");
 
 		ArrayList<Integer> p2Rows = p2.getRows();
@@ -193,6 +194,7 @@ public class Path {
 
 			// and point it SOUTH
 			arrowEndRow++;
+
 		}
 
 		if(nonRegionRowOffset == 0 && nonRegionColOffset == -1) {
