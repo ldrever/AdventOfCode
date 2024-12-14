@@ -28,7 +28,7 @@ public class Day12 {
 			//System.out.println();
 
 			area.getLoops(debug);
-			area.processLoops(debug);
+			//area.processLoops(debug);
 
 			//System.out.print("after looping - area : " + area.getAllegiance() + " paths: ");
 			//area.displayPaths();

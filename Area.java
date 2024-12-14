@@ -100,6 +100,9 @@ public class Area {
 				boolean connected = false;
 
 
+				if (this.allegiance == 'I') debug = true;
+/*
+*/
 				//if( outerloop + innerloop > 44) debug = true;
 				if(debug) {
 					Scanner sc = new Scanner(System.in);
@@ -115,17 +118,17 @@ public class Area {
 				for(int i = this.boundary.size() - 1; i > 0; i--) {
 
 					Path p1 = this.boundary.get(i);
-					//if(debug) System.out.print("Trying out path ");
-					//if(debug) System.out.print(p1.toString());
-
+					if(debug) System.out.print("Trying out path ");
+					if(debug) System.out.print(p1.toString());
+/*
 					if(p1.toString().equals("(1,128)->(2,128)")) debug = true;
 									if(debug) {
 										Scanner sc = new Scanner(System.in);
-										System.out.println("go?");
+										System.out.println("baddie found?");
 										String input = sc.next();
 										if(input.equalsIgnoreCase("N")) return;
 					}
-
+*/
 					String result = p0.attemptJoin(debug, allowLeftTurns, p1);
 
 					if(result.equals("OTHER JOIN")) {

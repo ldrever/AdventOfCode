@@ -81,12 +81,12 @@ public class Path {
 	public String attemptJoin(boolean debug, boolean allowLeftTurns, Path p2) {
 
 		String result = "OTHER JOIN";
-		if(debug) System.out.print("Checking whether path ");
+/*		if(debug) System.out.print("Checking whether path ");
 		if(debug) System.out.print(p2.toString());
 		if(debug) System.out.println(" can follow on from path ");
 		if(debug) System.out.print(this.toString());
 		if(debug) System.out.println(" Result:");
-
+*/
 		ArrayList<Integer> p2Rows = p2.getRows();
 		ArrayList<Integer> p2Cols = p2.getCols();
 
