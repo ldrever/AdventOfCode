@@ -9,23 +9,23 @@ public class LetterGrid {
 	private int height, width;
 	private char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
 
-	public int getHeight() {
+	public synchronized int getHeight() {
 		return this.height;
 	}
 
-	public int getWidth() {
+	public synchronized int getWidth() {
 		return this.width;
 	}
 
-	public char[][] getGrid() {
+	public synchronized char[][] getGrid() {
 		return this.grid;
 	}
 
-	public char getCell(int row, int col) {
+	public synchronized char getCell(int row, int col) {
 		return this.grid[row][col];
 	}
 
-	public void setCell(int row, int col, char c) {
+	public synchronized void setCell(int row, int col, char c) {
 		this.grid[row][col] = c;
 	}
 
@@ -59,7 +59,7 @@ public class LetterGrid {
 
 	} // constructor
 
-	public void wipe(char c) {
+	public synchronized void wipe(char c) {
 		for(int row = 0; row < this.getHeight(); row++) {
 			for(int column = 0; column < this.getWidth(); column++) {
 				this.setCell(row, column, c);
@@ -69,7 +69,7 @@ public class LetterGrid {
 	} // wipe method
 
 
-	public void floodFill(boolean debug, ArrayList<Area> areaList) {
+	public synchronized void floodFill(boolean debug, ArrayList<Area> areaList) {
 
 /*
 	Start with a seed cell, and iteratively apply the principle that

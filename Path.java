@@ -17,13 +17,47 @@ public class Path {
 	private String initialDirection;
 	private LetterGrid parentGrid;
 
-	public LetterGrid getParentGrid() {
+	public synchronized LetterGrid getParentGrid() {
 		return this.parentGrid;
 	}
 
-	public String getInitialDirection() {
+	public synchronized String getInitialDirection() {
 		return this.initialDirection;
 	}
+
+
+	public synchronized ArrayList<Integer> getRows() {
+		return this.rows;
+	}
+
+	public synchronized ArrayList<Integer> getCols() {
+		return this.cols;
+	}
+
+
+
+	public synchronized String toString() {
+		String result = "";
+		for(int i = 0; i < this.rows.size(); i++) {
+			result += ((i == 0 ? "" : "->") + "(" + this.rows.get(i) + "," + this.cols.get(i) + ")");
+
+		}
+		return result;
+	}
+
+
+	public synchronized String toAbbreviatedString(int maxLength) {
+
+		String fullString = this.toString();
+		if(fullString.length() <= maxLength) return fullString;
+
+		String dots = "...";
+		String results = fullString.substring(0, (maxLength-dots.length())/2);
+		results += dots;
+		results += fullString.substring(fullString.length() - results.length(), fullString.length());
+		return results;
+	}
+
 
 
 
@@ -60,63 +94,58 @@ public class Path {
 		this.rows = new ArrayList<Integer>();
 		this.cols = new ArrayList<Integer>();
 
-		rows.add(startRow);
-		cols.add(startCol);
-		rows.add(endRow);
-		cols.add(endCol);
+		this.rows.add(startRow);
+		this.cols.add(startCol);
+		this.rows.add(endRow);
+		this.cols.add(endCol);
+
+		//System.out.println("Imaginary path used: " + this.toString());
 
 	}
 
-	public ArrayList<Integer> getRows() {
-		return this.rows;
-	}
-
-	public ArrayList<Integer> getCols() {
-		return this.cols;
-	}
 
 
-
-	public String toString() {
-		String result = "";
-		for(int i = 0; i < rows.size(); i++) {
-			result += ((i == 0 ? "" : "->") + "(" + rows.get(i) + "," + cols.get(i) + ")");
-
-		}
-		return result;
-	}
-
-
-
-	public int countCorners() {
+	public synchronized int countCorners(boolean debug) {
 
 		int result = 0;
 
-		for(int currentIndex = 0; currentIndex < this.rows.size(); currentIndex++) {
+		System.out.print("countCorners has started at 0...");
+		System.out.println(this.toString());
 
+
+
+		for(int currentIndex = 0; currentIndex < this.rows.size(); currentIndex++) {
+			System.out.println(result + "at index " + currentIndex);
 			// pre-adding the size prevents the modulus operator from returning a negative
 			int prevIndex = (this.rows.size() + currentIndex - 1) % this.rows.size();
 			int nextIndex = (this.rows.size() + currentIndex + 1) % this.rows.size();
 
-			boolean prevHoriz = (this.rows.get(prevIndex) == this.rows.get(currentIndex));
-			boolean nextHoriz = (this.rows.get(currentIndex) == this.rows.get(nextIndex));
+			int horizCount = 0;
+			if (this.rows.get(prevIndex) == this.rows.get(currentIndex)) horizCount++;
+			if (this.rows.get(currentIndex) == this.rows.get(nextIndex)) horizCount++;
 
 			// XOR the horizontality going in and out of a given vertex - it's
 			// a corner if precisely one of the edges is horizontal
-			if(prevHoriz ^ nextHoriz) result++;
+			if(horizCount == 1) {
+
+				result++;
+
+
+			}
 
 		} // currentIndex loop
-
+		System.out.println("and finished at " + result);
 		return result;
 
 	} // countCorners method
 
 
 
-	public boolean isLoop() {
+	public synchronized boolean isLoop() {
 		// check whether the start is a valid join to the end
-		return (this.joinType(this) >= 0);
 
+			return (this.joinType(this) >= 0);
+		}
 
 
 		// note that there is never an act of "tying the knot"; a path is
@@ -145,10 +174,9 @@ public class Path {
 
 */
 
-	} // isLoop method
 
 
-	public void addPoint(int row, int col) {
+	public synchronized void addPoint(int row, int col) {
 
 		// trusts that this point DEFINITELY joins on to the end
 		this.rows.add(row);
@@ -169,15 +197,15 @@ public class Path {
 
 
 
-	public int getEndRow() {return this.rows.get(this.rows.size() - 1);}
-	public int getEndCol() {return this.cols.get(this.cols.size() - 1);}
+	public synchronized int getEndRow() {return this.rows.get(this.rows.size() - 1);}
+	public synchronized int getEndCol() {return this.cols.get(this.cols.size() - 1);}
 
-	public int getStartRow() {return this.rows.get(0);}
-	public int getStartCol() {return this.cols.get(0);}
+	public synchronized int getStartRow() {return this.rows.get(0);}
+	public synchronized int getStartCol() {return this.cols.get(0);}
 
 
 
-	public byte joinType(Path p2) {
+	public synchronized byte joinType(Path p2) {
 		/*
 			Returns:
 			-2 for an invalid left turn
@@ -196,29 +224,45 @@ public class Path {
 		if (this.getEndCol() != p2.getStartCol()) return -1;
 
 		// if they DO touch, work out the direction of turn - helps to picture a clock face
-		int oldDy = this.rows.get(this.rows.size() - 1) - this.rows.get(this.rows.size() - 2);
-		int oldDx = this.cols.get(this.cols.size() - 1) - this.cols.get(this.cols.size() - 2);
+		ArrayList<Integer> p2Rows = p2.getRows();
+		ArrayList<Integer> p2Cols = p2.getCols();
+
+		int nextRow = p2Rows.get(1);
+		int nextCol = p2Cols.get(1);
+
+		int preRow = this.rows.get(this.rows.size() - 2);
+		int preCol = this.cols.get(this.cols.size() - 2);
+
+		int thisRow = this.rows.get(this.rows.size() - 1);
+		int thisCol = this.cols.get(this.cols.size() - 1);
+
+		boolean debug = false; // (thisRow == 0 && thisCol == 0);
+
+		int newDx = nextCol - thisCol;
+		int newDy = nextRow - thisRow;
+
+		int oldDx = thisCol - preCol;
+		int oldDy = thisRow - preRow;
+
 		int oldClockDirection = 0;
 		if(oldDy == -1) oldClockDirection = 12;
 		if(oldDx == 1) oldClockDirection = 3;
 		if(oldDy == 1) oldClockDirection = 6;
 		if(oldDx == -1) oldClockDirection = 9;
 
-		ArrayList<Integer> p2Rows = p2.getRows();
-		ArrayList<Integer> p2Cols = p2.getCols();
-		int newDy = p2Rows.get(1) - p2Rows.get(0);
-		int newDx = p2Cols.get(1) - p2Cols.get(0);
 		int newClockDirection = 0;
 		if(newDy == -1) newClockDirection = 12;
 		if(newDx == 1) newClockDirection = 3;
 		if(newDy == 1) newClockDirection = 6;
 		if(newDx == -1) newClockDirection = 9;
 
-		int turn = newClockDirection -= oldClockDirection;
+
+		int turn = newClockDirection - oldClockDirection;
 		turn += 12; // now it's positive
 		turn %= 12; // now it's 0 - 11
 
-		switch(newClockDirection) {
+
+		switch(turn) {
 
 			case 0:return 0;
 			case 3:return 1;
@@ -226,6 +270,7 @@ public class Path {
 			// the start/end check
 
 		}
+		if (debug) System.out.println("Pre and post clockface directions here are " + oldClockDirection + " and " + newClockDirection);
 
 
 		// if it's a LEFT turn though, we need to verify that the "elbow"
@@ -234,6 +279,7 @@ public class Path {
 		// given that we have just made a left turn, the elbow character will
 		// be the right character of an imaginary arrow lined up behind the
 		// new arrow
+		if (debug) System.out.println("PROCESSING left turn detected from (" + preRow + "," + preCol + ") to (" + thisRow + "," + thisCol + ") to (" + nextRow + "," + nextCol + ")");
 
 		Path imaginary = new Path(p2);
 		char elbow = imaginary.getRightChar();
@@ -246,43 +292,53 @@ public class Path {
 
 
 
-	public char getRightChar() {
-		// what character lies on this path's right bank?
+	public synchronized char getRightChar() {
 
-		// knowing that a path's origin vertex shares the same coordinates
-		// as the square below and right of that vertex, start by saying
-		int charRow = this.rows.get(0);
-		int charCol = this.cols.get(0);
+			// what character lies on this path's right bank?
 
-		// now adjust based on direction
-		switch (this.initialDirection)
-		{
-			case "EAST":
-			// do nothing
-			break;
+			// knowing that a path's origin vertex shares the same coordinates
+			// as the square below and right of that vertex, start by saying
+			int charRow = this.rows.get(0);
+			int charCol = this.cols.get(0);
+	//	try {
 
-			case "WEST":
-			// want the character north and west of that initial choice
-			charRow--;
-			charCol--;
-			break;
+			// now adjust based on direction
+			switch (this.initialDirection)
+			{
+				case "EAST":
+				// do nothing
+				break;
 
-			case "NORTH":
-			// want the character north of that choice
-			charRow--;
-			break;
+				case "WEST":
+				// want the character north and west of that initial choice
+				charRow--;
+				charCol--;
+				break;
 
-			case "SOUTH":
-			// want the character west of that choice
-			charCol--;
-			break;
+				case "NORTH":
+				// want the character north of that choice
+				charRow--;
+				break;
+
+				case "SOUTH":
+				// want the character west of that choice
+				charCol--;
+				break;
+			}
+
+			return parentGrid.getCell(charRow, charCol);
+			/*
+		} catch (Exception e) {
+			System.out.println("Houston we have a problem");
+			System.out.println("Attempted to return the character at (" + charRow + "," + ")");
+			System.out.println("(Grid size: " + this.parentGrid.getHeight() + "x" + this.parentGrid.getWidth() + ")");
+			return '!';
 		}
-
-		return parentGrid.getCell(charRow, charCol);
+		*/
 	} // getRightChar method
 
 
-	public String attemptJoin(boolean debug, boolean allowLeftTurns, Path p2) {
+	public synchronized String attemptJoin(boolean debug, boolean allowLeftTurns, Path p2) {
 
 		String result = "OTHER JOIN";
 		byte joinType = this.joinType(p2);

@@ -5,9 +5,9 @@ public class Day12 {
 
 
 
-	public static void main(String[] chars) {
-		boolean debug = true;
-		String path = "Y:\\code\\java\\AdventOfCode\\Day12small.dat";
+	public synchronized static void main(String[] chars) {
+		boolean debug = false;
+		String path = "Y:\\code\\java\\AdventOfCode\\Day12input.dat";
 		LetterGrid lg;
 		ArrayList<Area> areaList = new ArrayList<Area>();
 		try {
@@ -23,25 +23,19 @@ public class Day12 {
 		int part2Score = 0;
 
 		for(Area area : areaList) {
-			System.out.print("area " + area.getAllegiance() + " including " + area.homeString());
-			//area.displayPaths();
-			//System.out.println();
-
 			area.getLoops(debug);
-			//area.processLoops(debug);
+			area.processLoops(debug);
+			System.out.println("Area " + area.getAllegiance() + " including " + area.homeString() + ": " + area.getVitalStatistics(debug));
+			area.printPaths(66);
+			System.out.println();
 
-			//System.out.print("after looping - area : " + area.getAllegiance() + " paths: ");
-			//area.displayPaths();
-			//System.out.println();
-			part1Score += area.edgeScore();
-			part2Score += area.sideScore(debug);
-
-
-
-
-			System.out.println("Areal summation: " + part1Score + " for part 1; " + part2Score + " for part 2");
+			int part1Current = area.edgeScore();
+			int part2Current = area.sideScore(debug);
+			part1Score += part1Current;
+			part2Score += part2Current;
 
 		}
+		System.out.println();
 		System.out.println("Final summation: " + part1Score + " for part 1; " + part2Score + " for part 2");
 		// FIXME ok so check that we have areas with all paths; then proceed PER TEB to tie those paths together...
 

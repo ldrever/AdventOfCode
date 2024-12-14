@@ -6,41 +6,49 @@ public class Area {
 	int homeCellRow;
 	int homeCellCol;
 	char allegiance;
+
 	int blockCount;
 	int edgeSegmentCount;
 	int sideCount;
 
 	ArrayList<Path> boundary;
 
-	public String homeString() {
+	public synchronized String homeString() {
 		String result = "";
 		result += "(" + this.homeCellRow + "," + this.homeCellCol + ")";
 		return result;
 	}
 
-	public char getAllegiance() {
+	public synchronized String getVitalStatistics(boolean debug) {
+		String result = this.blockCount + " blocks, ";
+		result += this.sideCount + " sides and ";
+		result += this.edgeSegmentCount + " edge segments, thus scoring ";
+		result += this.edgeScore() + " (part 1) and ";
+		result += this.sideScore(debug) + " (part 2)";
+		return result;
+	}
+
+	public synchronized char getAllegiance() {
 		return this.allegiance;
 	}
 
-	public void setBlocks(int blocks) {
+	public synchronized void setBlocks(int blocks) {
 		this.blockCount = blocks;
 	}
 
-	public void setEdgeSegments(int edgeSegments) {
+	public synchronized void setEdgeSegments(int edgeSegments) {
 		this.edgeSegmentCount = edgeSegments;
 	}
 
-	public void setSideCount(int sideCount) {
+	public synchronized void setSideCount(int sideCount) {
 		this.sideCount = sideCount;
 	}
 
-	public int edgeScore() {
-
+	public synchronized int edgeScore() {
 		return this.blockCount * this.edgeSegmentCount;
 	}
 
-	public int sideScore(boolean debug) {
-		if(debug) System.out.println(this.blockCount + " blocks and " + this.sideCount + " sides.");
+	public synchronized int sideScore(boolean debug) {
 		return this.blockCount * this.sideCount;
 	}
 
@@ -53,21 +61,25 @@ public class Area {
 		this.allegiance = allegiance;
 	}
 
-	public void addPath(Path path) {
+	public synchronized void addPath(Path path) {
 		this.boundary.add(path);
 	}
 
 
 
-	public String toString() {
+	public synchronized String toString() {
 		String result = "";
-		for(Path path : boundary) result += path.toString();
+		for(Path path : boundary) result += path.toString() + "; ";
 		return result;
 	} // toString method
 
 
+	public synchronized void printPaths(int maxLength) {
+		for(Path path : boundary) System.out.println("path: " + path.toAbbreviatedString(maxLength));
+	}
 
-	public void getLoops(boolean debug) {
+
+	public synchronized void getLoops(boolean debug) {
 
 		// work through its boundary set until that is empty, and the following contains one or more loop-paths:
 		ArrayList<Path> loopSet = new ArrayList<Path>();
@@ -99,7 +111,7 @@ public class Area {
 				boolean connected = false;
 
 
-				if (this.allegiance == 'I') debug = true;
+				//if (this.allegiance == 'I') debug = true;
 /*
 */
 				//if( outerloop + innerloop > 44) debug = true;
@@ -139,7 +151,7 @@ public class Area {
 
 					if(result.equals("LEFT JOIN")) {
 						lefties.add(p1);
-						System.out.println("trying to remove item " + i + " of " + boundary.size());
+						if(debug) System.out.println("trying to remove item " + i + " of " + boundary.size());
 
 						boundary.remove(i);
 						if(debug) System.out.println("Path " + i + " (a left join) deferred.");
@@ -179,20 +191,21 @@ public class Area {
 
 	// boundary will be empty at this point
 	this.boundary = loopSet;
+	System.out.println("it has " + this.boundary.size() + " bounding loops");
 
 	} // getLoops method
 
 
 
-	public void processLoops(boolean debug) {
+	public synchronized void processLoops(boolean debug) {
 		this.sideCount = 0;
 		if(debug) System.out.println("Boundary includes " + boundary.size() + " paths.");
 		// trusting that the boundary is already a small number of loops at this point
 		for(Path path : boundary) {
-			this.sideCount += path.countCorners();
-			if(debug) System.out.print("Counted " + path.countCorners() + " corners in path ");
+			this.sideCount += path.countCorners(debug);
+			if(debug) System.out.print("Counted " + path.countCorners(debug) + " corners in path ");
 			if(debug) System.out.print(path.toString());
-			System.out.println();
+			//System.out.println();
 
 
 		}
