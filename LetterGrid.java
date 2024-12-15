@@ -6,26 +6,26 @@ import java.util.ArrayList;
 
 public class LetterGrid {
 
-	private int height, width;
-	private char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
+	private volatile int height, width;
+	private volatile char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
 
-	public int getHeight() {
+	public synchronized int getHeight() {
 		return this.height;
 	}
 
-	public int getWidth() {
+	public synchronized int getWidth() {
 		return this.width;
 	}
 
-	public char[][] getGrid() {
+	public synchronized char[][] getGrid() {
 		return this.grid;
 	}
 
-	public char getCell(int row, int col) {
+	public synchronized char getCell(int row, int col) {
 		return this.grid[row][col];
 	}
 
-	public void setCell(int row, int col, char c) {
+	public synchronized void setCell(int row, int col, char c) {
 		this.grid[row][col] = c;
 	}
 
@@ -59,7 +59,7 @@ public class LetterGrid {
 
 	} // constructor
 
-	public void wipe(char c) {
+	public synchronized void wipe(char c) {
 		for(int row = 0; row < this.getHeight(); row++) {
 			for(int column = 0; column < this.getWidth(); column++) {
 				this.setCell(row, column, c);
@@ -69,7 +69,7 @@ public class LetterGrid {
 	} // wipe method
 
 
-	public void floodFill(boolean debug, ArrayList<Area> areaList) {
+	public synchronized void floodFill(boolean debug, ArrayList<Area> areaList) {
 
 /*
 	Start with a seed cell, and iteratively apply the principle that
@@ -146,13 +146,9 @@ public class LetterGrid {
 			frontierCount--;
 
 			char friendlyChar = this.getCell(startRow, startCol);
-
 			Area friendlyArea = new Area(startRow, startCol, friendlyChar);
-
 			areaList.add(friendlyArea);
-
 			int areaIndex = areaList.size() - 1;
-
 			int edgeCount = 0;
 
 			// inner loop: are there any friendly cells left to process?
@@ -190,7 +186,7 @@ public class LetterGrid {
 							for(int check = 0; check < foreignCount; check++) {
 								if(foreignRows.get(check) == newRow && foreignCols.get(check) == newCol) {
 									edgeCount++;
-									friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+									friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 
 									continue nextNeighbour;
 								}
@@ -216,7 +212,7 @@ public class LetterGrid {
 
 									} else {
 										edgeCount++;
-										friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+										friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 									}
 
 									continue nextNeighbour;
@@ -239,13 +235,13 @@ public class LetterGrid {
 								frontierCount++;
 
 								edgeCount++;
-								friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+								friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 							}
 
 						} catch (Exception e) {
 							// scenario E - edge of the map
 							edgeCount++;
-							friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx));
+							friendlyArea.addPath(new Path(cellRow, cellCol, dy, dx, this));
 
 						} // try-catch
 
@@ -279,47 +275,10 @@ public class LetterGrid {
 			friendlyCols.clear();
 			friendlyCount = 0;
 
-
-/*
-
-			Scanner sc = new Scanner(System.in);
-			System.out.print("Continue?");
-			String input = sc.next();
-			sc.close();
-			if(input.equalsIgnoreCase("N")) return;
-
-*/
-
 		} // while(frontierCount > 0)
-
-
-
-// maybe a shouldIModify flag? or just return an altered map?
-
-// might want to return an AL of its "frontier"
 
 	} // floodFill method
 
 
-	public LetterGrid (boolean debug, LetterGrid interior, char defaultChar) {
-		// surround the input LetterGrid with a one-character border to return
-		// a new one that is 2 rows and 2 columns larger
 
-		this.height = 2 + interior.getHeight();
-		this.width = 2 + interior.getWidth();
-
-		this.grid = new char[this.height][this.width];
-
-		for(int row = 0; row < this.height; row++) {
-			for(int col = 0; col < this.width; col++) {
-
-				if(row == 0 || col == 0 || row + 1 == this.height|| col + 1 == this.width ) {
-					this.setCell(row, col, defaultChar);
-				} else {
-					this.setCell(row, col, interior.getCell(row - 1, col - 1));
-				}
-			}
-		}
-
-	} // surround constructor
 }
