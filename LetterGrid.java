@@ -146,13 +146,9 @@ public class LetterGrid {
 			frontierCount--;
 
 			char friendlyChar = this.getCell(startRow, startCol);
-
 			Area friendlyArea = new Area(startRow, startCol, friendlyChar);
-
 			areaList.add(friendlyArea);
-
 			int areaIndex = areaList.size() - 1;
-
 			int edgeCount = 0;
 
 			// inner loop: are there any friendly cells left to process?
@@ -279,47 +275,10 @@ public class LetterGrid {
 			friendlyCols.clear();
 			friendlyCount = 0;
 
-
-/*
-
-			Scanner sc = new Scanner(System.in);
-			System.out.print("Continue?");
-			String input = sc.next();
-			sc.close();
-			if(input.equalsIgnoreCase("N")) return;
-
-*/
-
 		} // while(frontierCount > 0)
-
-
-
-// maybe a shouldIModify flag? or just return an altered map?
-
-// might want to return an AL of its "frontier"
 
 	} // floodFill method
 
 
-	public LetterGrid (boolean debug, LetterGrid interior, char defaultChar) {
-		// surround the input LetterGrid with a one-character border to return
-		// a new one that is 2 rows and 2 columns larger
 
-		this.height = 2 + interior.getHeight();
-		this.width = 2 + interior.getWidth();
-
-		this.grid = new char[this.height][this.width];
-
-		for(int row = 0; row < this.height; row++) {
-			for(int col = 0; col < this.width; col++) {
-
-				if(row == 0 || col == 0 || row + 1 == this.height|| col + 1 == this.width ) {
-					this.setCell(row, col, defaultChar);
-				} else {
-					this.setCell(row, col, interior.getCell(row - 1, col - 1));
-				}
-			}
-		}
-
-	} // surround constructor
 }

@@ -2,15 +2,25 @@ import java.util.*;
 import java.io.*;
 
 public class Area {
+	/*
+		An AREA is a group of contiguously-neighbouring CELLS on a grid,
+		all containing the same CHARACTER, aka having the same ALLEGIANCE.
 
+		Note that we don't actually need the enumeration of those cells
+		here - everything works by knowing the area's one or more
+		BOUNDARY PATHS.
+
+	*/
+
+
+
+	// data
 	private volatile int homeCellRow;
 	private volatile int homeCellCol;
 	private volatile char allegiance;
-
 	private volatile int blockCount;
 	private volatile int edgeSegmentCount;
 	private volatile int sideCount;
-
 	private volatile ArrayList<Path> boundary;
 
 	public synchronized String homeString() {
@@ -28,29 +38,12 @@ public class Area {
 		return result;
 	}
 
-	public synchronized char getAllegiance() {
-		return this.allegiance;
-	}
-
-	public synchronized void setBlocks(int blocks) {
-		this.blockCount = blocks;
-	}
-
-	public synchronized void setEdgeSegments(int edgeSegments) {
-		this.edgeSegmentCount = edgeSegments;
-	}
-
-	public synchronized void setSideCount(int sideCount) {
-		this.sideCount = sideCount;
-	}
-
-	public synchronized int edgeScore() {
-		return this.blockCount * this.edgeSegmentCount;
-	}
-
-	public synchronized int sideScore(boolean debug) {
-		return this.blockCount * this.sideCount;
-	}
+	public synchronized char getAllegiance() {return this.allegiance;}
+	public synchronized void setBlocks(int blocks) {this.blockCount = blocks;}
+	public synchronized void setEdgeSegments(int edgeSegments) {this.edgeSegmentCount = edgeSegments;}
+	public synchronized void setSideCount(int sideCount) {this.sideCount = sideCount;}
+	public synchronized int edgeScore() {return this.blockCount * this.edgeSegmentCount;}
+	public synchronized int sideScore(boolean debug) {return this.blockCount * this.sideCount;}
 
 
 	public Area (int homeCellRow, int homeCellCol, char allegiance) {
@@ -105,23 +98,15 @@ public class Area {
 					}
 				}
 
-
-
 				Path p0 = this.boundary.get(0);
 				boolean connected = false;
 
-
-				//if (this.allegiance == 'I') debug = true;
-/*
-*/
-				//if( outerloop + innerloop > 44) debug = true;
 				if(debug) {
 					Scanner sc = new Scanner(System.in);
 					System.out.println("go?");
 					String input = sc.next();
 					if(input.equalsIgnoreCase("N")) return;
 				}
-
 
 				ArrayList<Path> lefties = new ArrayList<Path>();
 				boolean allowLeftTurns = false;
@@ -131,15 +116,7 @@ public class Area {
 					Path p1 = this.boundary.get(i);
 					if(debug) System.out.print("Trying out path ");
 					if(debug) System.out.print(p1.toString());
-/*
-					if(p1.toString().equals("(1,128)->(2,128)")) debug = true;
-									if(debug) {
-										Scanner sc = new Scanner(System.in);
-										System.out.println("baddie found?");
-										String input = sc.next();
-										if(input.equalsIgnoreCase("N")) return;
-					}
-*/
+
 					String result = p0.attemptJoin(debug, allowLeftTurns, p1);
 
 					if(result.equals("OTHER JOIN")) {
@@ -158,8 +135,6 @@ public class Area {
 
 					}
 				} // for i loop
-
-
 
 				if(!connected) {
 					allowLeftTurns = true;
@@ -191,7 +166,6 @@ public class Area {
 
 	// boundary will be empty at this point
 	this.boundary = loopSet;
-	System.out.println("it has " + this.boundary.size() + " bounding loops");
 
 	} // getLoops method
 
@@ -202,14 +176,10 @@ public class Area {
 		if(debug) System.out.println("Boundary includes " + boundary.size() + " paths.");
 		// trusting that the boundary is already a small number of loops at this point
 		for(Path path : boundary) {
-			this.sideCount += path.countCorners2();
-			if(debug) System.out.print("Counted " + path.countCorners2() + " corners in path ");
+			this.sideCount += path.countCorners();
+			if(debug) System.out.print("Counted " + path.countCorners() + " corners in path ");
 			if(debug) System.out.print(path.toString());
-			//System.out.println();
-
-
 		}
-
 
 	} // processLoops method
 
