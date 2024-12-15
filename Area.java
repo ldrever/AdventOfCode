@@ -202,8 +202,8 @@ public class Area {
 		if(debug) System.out.println("Boundary includes " + boundary.size() + " paths.");
 		// trusting that the boundary is already a small number of loops at this point
 		for(Path path : boundary) {
-			this.sideCount += path.countCorners(debug);
-			if(debug) System.out.print("Counted " + path.countCorners(debug) + " corners in path ");
+			this.sideCount += path.countCorners2();
+			if(debug) System.out.print("Counted " + path.countCorners2() + " corners in path ");
 			if(debug) System.out.print(path.toString());
 			//System.out.println();
 

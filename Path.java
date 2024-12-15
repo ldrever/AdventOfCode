@@ -62,7 +62,7 @@ public class Path {
 
 
 	public Path(Path forwardsPath) {
-	// special constructor returning a one-element path that WOULD
+	// special constructor returning a one-step path that WOULD
 	// flow inwards to the parameter path, in the same direction as its start
 		this.parentGrid = forwardsPath.getParentGrid();
 		this.initialDirection = forwardsPath.getInitialDirection();
@@ -94,19 +94,45 @@ public class Path {
 		this.rows = new ArrayList<Integer>();
 		this.cols = new ArrayList<Integer>();
 
-		this.rows.add(startRow);
-		this.cols.add(startCol);
-		this.rows.add(endRow);
-		this.cols.add(endCol);
-
-
-		this.addPoint(startRow, startCol);
-		this.addPoint(endRow, endCol);
+		this.addPoint(startRow, startCol, "startpoint of imaginary vector");
+		this.addPoint(endRow, endCol, "endpoint of imaginary vector");
 
 		//System.out.println("Imaginary path used: " + this.toString());
 
 	}
 
+	public synchronized int countCorners2() {
+		ArrayList<Path> steps = new ArrayList<Path>();
+
+		// remember that 0 and this.rows.size() - 1 are the same point
+		// a path with N entries in rows/cols means N vertices, and N-1
+		// individual steps
+		System.out.println("Starting corner-count on " + this.toString());
+		for(int i = 0; i < this.rows.size() - 1; i++) {
+			System.out.print("The " + i + "th step is ");
+			Path step = new Path(this, i);
+			System.out.println(step.toString());
+			steps.add(step);
+		}
+
+		int stepCount = steps.size();
+		System.out.println(stepCount + "steps detuct");
+		Path p1 = steps.get(stepCount - 1);
+
+		int count = 0;
+
+		for(int i = 0; i < stepCount; i++) {
+
+			Path p2 = steps.get(i);
+			System.out.println("corner-detection between " + p1.toString() + " and " + p2.toString());
+			byte type = p1.joinType(p2);
+			p1 = p2;
+			if(type > 0) count++;
+
+		}
+		return count;
+
+	}
 
 
 	public synchronized int countCorners(boolean debug) {
@@ -116,11 +142,11 @@ public class Path {
 		System.out.print("countCorners has started at 0...");
 		System.out.println(this.toString());
 
-			@SuppressWarnings("unchecked")
-		ArrayList<Integer>	myRows = (ArrayList<Integer>) this.rows.clone();
 
-			@SuppressWarnings("unchecked")
-		ArrayList<Integer>	myCols = (ArrayList<Integer>) this.cols.clone();
+		ArrayList<Integer> myRows =  this.rows;
+
+
+		ArrayList<Integer> myCols = this.cols;
 
 			int size = myRows.size();
 
@@ -201,8 +227,21 @@ public class Path {
 
 
 
-	public synchronized void addPoint(int row, int col) {
+	public synchronized void addPoint(int row, int col, String message) {
 
+int i = 0;
+
+		if (this.rows.size() != 0) {
+			if (this.rows.get(this.rows.size() - 1) == row) {
+				if (this.cols.get(this.cols.size() - 1) == col) {
+					Scanner sc = new Scanner(System.in);
+					System.out.println(message);
+					System.out.println("continue?");
+					String input = sc.next();
+					if(input.equalsIgnoreCase("N")) i = 1 / 0;
+				}
+			}
+		}
 		// trusts that this point DEFINITELY joins on to the end
 		this.rows.add(row);
 		this.cols.add(col);
@@ -382,7 +421,7 @@ public class Path {
 
 			// start from 1 not 0, since 0 is a repeat of this's end-point
 			for(int i = 1; i < p2Rows.size(); i++) {
-				this.addPoint(p2Rows.get(i), p2Cols.get(i));
+				this.addPoint(p2Rows.get(i), p2Cols.get(i), i + "th addment of attemptJoin");
 			}
 			if(debug) System.out.println(" success");
 
@@ -392,6 +431,36 @@ public class Path {
 	} // attemptJoin method
 
 
+	public Path (Path input, int step) {
+		// special constructor
+		// return the 0+'th single-step sub-path of the input
+
+
+
+		ArrayList<Integer> inputRows = input.getRows();
+		ArrayList<Integer> inputCols = input.getCols();
+
+		this.rows = new ArrayList<Integer>();
+		this.cols = new ArrayList<Integer>();
+
+		this.rows.add(inputRows.get(step));
+		this.cols.add(inputCols.get(step));
+
+		this.rows.add(inputRows.get(step + 1));
+		this.cols.add(inputCols.get(step + 1));
+
+		this.parentGrid = input.getParentGrid();
+
+		int dy = this.rows.get(1) - this.rows.get(0);
+		int dx = this.cols.get(1) - this.cols.get(0);
+
+		if (dx == 1) this.initialDirection = "EAST";
+		if (dx == -1) this.initialDirection = "WEST";
+		if (dy == 1) this.initialDirection = "SOUTH";
+		if (dy == -1) this.initialDirection = "NORTH";
+
+		System.out.println("testing we got here at step " + step);
+	}
 
 
 	public Path (int regionRow, int regionCol, int nonRegionRowOffset, int nonRegionColOffset, LetterGrid parentGrid) {
@@ -462,8 +531,8 @@ public class Path {
 			arrowEndCol++;
 		}
 
-		this.addPoint(arrowStartRow, arrowStartCol);
-		this.addPoint(arrowEndRow, arrowEndCol);
+		this.addPoint(arrowStartRow, arrowStartCol, "basic bitch flood fill startpoint");
+		this.addPoint(arrowEndRow, arrowEndCol, "basic bitch flood fill endpoint");
 
 	}
 
