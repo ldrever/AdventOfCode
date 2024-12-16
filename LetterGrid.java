@@ -303,4 +303,20 @@ public class LetterGrid {
 
 
 
+	public long sumGPS() {
+		char box = 'O';
+		long score = 0;
+
+		for(int i = 0; i < this.height; i++) {
+			for(int j = 0; j < this.width; j++) {
+				if(box == this.getCell(i, j)) {
+					score += i * 100 + j;
+				}
+			}
+		}
+
+		return score;
+
+	} // sumGPS method
+
 }
