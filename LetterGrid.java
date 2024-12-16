@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class LetterGrid {
 
 	private volatile int height, width;
+	private int robotCol, robotRow;
 	private volatile char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
 
 	public synchronized int getHeight() {
@@ -318,5 +319,99 @@ public class LetterGrid {
 		return score;
 
 	} // sumGPS method
+
+
+
+	public void findRobot(boolean debug) {
+
+		for(int row = 0; row < this.height; row++) {
+			for(int column = 0; column < this.width; column++) {
+
+				char cellChar = this.getCell(row,column);
+				if(cellChar == '@') {
+					this.robotCol = column;
+					this.robotRow = row;
+
+					if (debug) System.out.println("New map. robot starts at (" + row + ", " + column + ")");
+
+					return;
+				}
+			}
+		}
+	} // findRobot method
+
+
+
+	public void evolve(char next) {
+		int dy = 0;
+		int dx = 0;
+
+		switch(next) {
+			case 'v':
+				dy++;
+			break;
+
+			case '^':
+				dy--;
+			break;
+
+			case '<':
+				dx--;
+			break;
+
+			case '>':
+				dx++;
+			break;
+		} // switch char
+
+		this.successfulPush(this.robotRow, this.robotCol, dy, dx);
+
+	} // evolve method
+
+	public boolean successfulPush(int y, int x, int dy, int dx) {
+		// say that we WANT to move the object in the cell at (y, x) into the
+		// cell at (y + dy, x + dx); these will always be horizontal or
+		// vertical neighbours
+
+		switch (this.getCell(y + dy, x + dx)) {
+			case '#':
+				return false;
+
+			case 'O':
+				// recurse
+				if(!this.successfulPush(y + dy, x + dx, dy, dx)) return false;
+				// intentionally no break
+
+			case '.':
+				char c = this.getCell(y, x);
+				if ('@' == c) {
+					this.robotRow = y + dy;
+					this.robotCol = x + dx;
+				}
+				this.setCell(y + dy, x + dx, c);
+				this.setCell(y, x, '.');
+				return true;
+
+		} // switch
+		return false; // should be impossible
+	} // attemptPush method
+
+
+
+	public void displayArray() {
+
+		for(int i = 0; i < this.height; i++) {
+			for(int j = 0; j < this.width; j++)
+				System.out.print(this.grid[i][j]);
+
+			System.out.println();
+		}
+
+
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Continue?");
+		String input = sc.next();
+		sc.close();
+	} // displayArray method
 
 }
