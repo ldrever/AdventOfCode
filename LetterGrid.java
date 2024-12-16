@@ -304,8 +304,7 @@ public class LetterGrid {
 
 
 
-	public long sumGPS() {
-		char box = 'O';
+	public long sumGPS(char box) {
 		long score = 0;
 
 		for(int i = 0; i < this.height; i++) {
@@ -367,6 +366,43 @@ public class LetterGrid {
 		this.successfulPush(this.robotRow, this.robotCol, dy, dx);
 
 	} // evolve method
+
+
+	public boolean isMovable(int y, int x, int dy) {
+
+		// double-width boxes means we need a two-pass approach -
+		// once to determine the possibility of moving, and
+		// another to execute it
+
+		// so let's recursively determine the movability of a box
+		// whose left OR right portion lies at (y, x)...
+
+		int left = x;
+		int right = x;
+		int row = y + dy;
+
+		switch(this.getCell(y, x)) {
+
+			case '#':
+				return false;
+
+			case '.':
+				return true;
+
+			case '[':
+				right++;
+				return isMovable(row, left, dy) && isMovable(row, right, dy);
+
+			case ']':
+				left--;
+				return isMovable(row, left, dy) && isMovable(row, right, dy);
+
+		} // switch
+		return false; // should not be reachable
+
+	} // boxNudge method
+
+
 
 	public boolean successfulPush(int y, int x, int dy, int dx) {
 		// say that we WANT to move the object in the cell at (y, x) into the

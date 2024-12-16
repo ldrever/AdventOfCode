@@ -23,8 +23,8 @@ class Day15 {
 		LetterGrid lg = null;
 
 		try {
-			controls = getControls("Y:\\code\\java\\AdventOfCode\\Day15control.dat");
-			lg = new LetterGrid("Y:\\code\\java\\AdventOfCode\\Day15input.dat");
+			//controls = getControls("Y:\\code\\java\\AdventOfCode\\Day15control.dat");
+			lg = new LetterGrid("Y:\\code\\java\\AdventOfCode\\Day15small.dat");
 		}
 		catch (Exception e) {System.out.println("file processing error");}
 
@@ -36,7 +36,7 @@ class Day15 {
 			//lg.displayArray();
 		}
 
-		System.out.println(lg.sumGPS());
+		System.out.println(lg.sumGPS('['));
 
 
 	} // main method
