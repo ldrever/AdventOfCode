@@ -3,8 +3,17 @@ import java.io.*;
 
 class Day14 {
 
-	public static ArrayList<String> processFile(String filePath, int height, int width, int time) {
-		ArrayList<String> quadrants = new ArrayList<String>();
+
+
+	public static void populateFromFile(
+		  String filePath
+
+		// void method but it updates all 4 of these:
+		, ArrayList<Integer> initialPositionX
+		, ArrayList<Integer> initialPositionY
+		, ArrayList<Integer> velocityX
+		, ArrayList<Integer> velocityY
+		) {
 
 		try {
 			File fi = new File(filePath);
@@ -23,94 +32,114 @@ class Day14 {
 				String[] p = position.split(",");
 				String[] v = velocity.split(",");
 
-				int px = Integer.parseInt(p[0]);
-				int py = Integer.parseInt(p[1]);
-				int vx = Integer.parseInt(v[0]);
-				int vy = Integer.parseInt(v[1]);
-
-				String quad = getQuadrant(width, height, px, py, vx, vy, time);
-				//System.out.println(quad);
-				quadrants.add(quad);
-
-
-			}
+				initialPositionX.add(Integer.parseInt(p[0]));
+				initialPositionY.add(Integer.parseInt(p[1]));
+				velocityX.add(Integer.parseInt(v[0]));
+				velocityY.add(Integer.parseInt(v[1]));
+			} // file-read while loop
 
 			sc.close();
 			System.out.println("Success processing file");
-			return quadrants;
 
 		} catch (Exception e) {
 			System.out.println("Error processing file");
-			return null;
 		}
 
-	} // processFile method
+	} // populateFromFile method
 
 
 
-	public static String getQuadrant(int width, int height, int px, int py, int vx, int vy, int time) {
+	public static void evolve(
+		  int height
+		, int width
+		, int time
+		, ArrayList<Integer> velocityX
+		, ArrayList<Integer> velocityY
+
+		// void method but it updates these:
+		, ArrayList<Integer> positionX
+		, ArrayList<Integer> positionY
+		) {
+
+		int robotCount = positionX.size();
+		for(int robot = 0; robot < robotCount; robot++) {
+
+			int px = positionX.get(robot);
+			int py = positionY.get(robot);
+			int vx = velocityX.get(robot);
+			int vy = velocityY.get(robot);
+
+			int tx = px + time * vx;
+			tx %= width;
+			tx += width;
+			tx %= width;
+			int ty = py + time * vy;
+			ty %= height;
+			ty += height;
+			ty %= height;
+
+			positionX.set(robot, tx);
+			positionY.set(robot, ty);
+
+		} // robot for-loop
+
+	} // evolve method
+
+
+
+	public static ArrayList<String> getQuadrants(
+		  int height
+		, int width
+		, ArrayList<Integer> positionX
+		, ArrayList<Integer> positionY
+		) {
+
 		int dmzColumn = width / 2; // e.g. for a width of 5, being 01234, this correctly returns 2 as the middle
 		int dmzRow = height / 2;
 
-		String result = "";
+		ArrayList<String> quadrants = new ArrayList<String>();
 
-		int tx = px + time * vx;
-		tx %= width;
-		tx += width;
-		tx %= width;
+		int robotCount = positionX.size();
+		for(int robot = 0; robot < robotCount; robot++) {
 
-		int ty = py + time * vy;
-		ty %= height;
-		ty += height;
-		ty %= height;
+			String result = "";
 
-		if(tx == dmzColumn || ty == dmzRow) return "DMZ";
-		result += ty < dmzRow ? "TOP" : "BOTTOM";
-		result += " ";
-		result += tx < dmzColumn ? "LEFT" : "RIGHT";
+			int tx = positionX.get(robot);
+			int ty = positionY.get(robot);
 
-		return result;
+			if(tx == dmzColumn || ty == dmzRow) {
+				result += "DMZ";
+			} else {
+				result += ty < dmzRow ? "TOP" : "BOTTOM";
+				result += " ";
+				result += tx < dmzColumn ? "LEFT" : "RIGHT";
+			}
+			quadrants.add(result);
 
-	} // getQuadrant method
+		} // robot for-loop
+
+		return quadrants;
+
+	} // getQuadrants method
+
 
 
 	public static int safetyFactor(ArrayList<String> quadrants) {
-
 		int topLeft = 0, topRight = 0, bottomLeft = 0, bottomRight = 0;
-
 		for(String str : quadrants) {
-
 			switch(str) {
-
 				case "DMZ":break;
 				case "TOP LEFT":topLeft++;break;
 				case "TOP RIGHT":topRight++;break;
 				case "BOTTOM LEFT":bottomLeft++;break;
 				case "BOTTOM RIGHT":bottomRight++;break;
-
 			}
-
 		}
-
 		return topLeft * topRight * bottomLeft * bottomRight;
 
 	} // safetyFactor method
 
-	public static void main(String[] args) {
 
-		int width = 101;
-		int height = 103;
-		int time = 100;
-		ArrayList<String> quadrants = processFile("Y:\\code\\java\\AdventOfCode\\Day14input.dat", height, width, time);
-
-		System.out.println("Part 1 answer: " + safetyFactor(quadrants));
-
-		displayArray();
-
-	} // main method
-
-
-	// public static void displayAtTime(int[][] positions, int[][] velocities, int time) {
 
 	public static void displayArray(ArrayList<Integer> x, ArrayList<Integer> y) {
 
@@ -130,7 +159,31 @@ class Day14 {
 			}
 			System.out.println();
 		}
-	}
+	} // displayArray method
+
+
+
+	public static void main(String[] args) {
+
+		String path = "Y:\\code\\java\\AdventOfCode\\Day14input.dat";
+		ArrayList<Integer> positionX = new ArrayList<Integer>();
+		ArrayList<Integer> positionY = new ArrayList<Integer>();
+		ArrayList<Integer> velocityX = new ArrayList<Integer>();
+		ArrayList<Integer> velocityY = new ArrayList<Integer>();
+		populateFromFile(path, positionX, positionY, velocityX, velocityY);
+
+		int width = 101;
+		int height = 103;
+		int time = 100;
+
+		evolve(height, width, time, velocityX, velocityY, positionX, positionY);
+		ArrayList<String> quadrants = getQuadrants(height, width, positionX, positionY);
+		System.out.println("Part 1 answer: " + safetyFactor(quadrants));
+
+		//displayArray();
+
+	} // main method
+
 
 
 } // Day13 class
