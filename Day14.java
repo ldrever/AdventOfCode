@@ -105,9 +105,32 @@ class Day14 {
 
 		System.out.println("Part 1 answer: " + safetyFactor(quadrants));
 
-
+		displayArray();
 
 	} // main method
+
+
+	// public static void displayAtTime(int[][] positions, int[][] velocities, int time) {
+
+	public static void displayArray(ArrayList<Integer> x, ArrayList<Integer> y) {
+
+		int height = 3;
+		int width = 12;
+
+		int[][] results = new int[height][width];
+
+		for(int index = 0; index < x.size(); index++) {
+			results[y.get(index)][x.get(index)] = 1;
+
+		}
+
+		for(int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++) {
+				System.out.print(results[i][j]);
+			}
+			System.out.println();
+		}
+	}
 
 
 } // Day13 class
