@@ -39,6 +39,7 @@ public class Area {
 	}
 
 	public synchronized char getAllegiance() {return this.allegiance;}
+	public synchronized int getBlocks() {return this.blockCount;}
 	public synchronized void setBlocks(int blocks) {this.blockCount = blocks;}
 	public synchronized void setEdgeSegments(int edgeSegments) {this.edgeSegmentCount = edgeSegments;}
 	public synchronized void setSideCount(int sideCount) {this.sideCount = sideCount;}

@@ -29,6 +29,22 @@ public class LetterGrid {
 		this.grid[row][col] = c;
 	}
 
+	public LetterGrid(boolean[][] inputBool, char ifTrue, char ifFalse) {
+
+		this.height = inputBool.length;
+		this.width = inputBool[0].length;
+
+		this.grid = new char[this.height][this.width];
+
+		for(int i = 0; i < this.height; i++) {
+			for(int j = 0; j < this.width; j++) {
+				this.grid[i][j] = inputBool[i][j] ? ifTrue : ifFalse;
+			} // horizontal loop
+		} // vertical loop
+
+	} // constructor
+
+
 	public LetterGrid(String path) throws IOException {
 
 		ArrayList<char[]> inputLines = new ArrayList<char[]>();
@@ -70,6 +86,12 @@ public class LetterGrid {
 
 
 	public synchronized void floodFill(boolean debug, ArrayList<Area> areaList) {
+		this.floodFill(debug, areaList, 0, 0);
+
+	}
+
+
+	public synchronized void floodFill(boolean debug, ArrayList<Area> areaList, int beginRow, int beginCol) {
 
 /*
 	Start with a seed cell, and iteratively apply the principle that
@@ -125,8 +147,8 @@ public class LetterGrid {
 
 		ArrayList<Integer> frontierRows = new ArrayList<Integer>();
 		ArrayList<Integer> frontierCols = new ArrayList<Integer>();
-		frontierRows.add(0);
-		frontierCols.add(0);
+		frontierRows.add(beginRow);
+		frontierCols.add(beginCol);
 		int frontierCount = 1;
 
 		// outer loop: are there any frontier cells left to process?

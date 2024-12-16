@@ -87,83 +87,112 @@ class Day14 {
 
 
 
-	public static ArrayList<String> getQuadrants(
-		  int height
-		, int width
+	public static int[][] divisions(
+		  int globalHeight
+		, int globalWidth
+		, int boxHeight
+		, int boxWidth
 		, ArrayList<Integer> positionX
 		, ArrayList<Integer> positionY
 		) {
 
-		int dmzColumn = width / 2; // e.g. for a width of 5, being 01234, this correctly returns 2 as the middle
-		int dmzRow = height / 2;
+		int yDivision = 1 + boxHeight;
+		int xDivision = 1 + boxWidth;
 
-		ArrayList<String> quadrants = new ArrayList<String>();
+		// ensure we don't count any zero-dimension boxes in the case of
+		// an exterior border
+		if(globalHeight % yDivision == 0) globalHeight--;
+		if(globalWidth % xDivision == 0) globalWidth--;
+
+		// having done the above, we know that the number of BORDERS will
+		// be e.g. globalHeight / yDivision using integer division... hence
+		// add 1 to that to store results:
+		int rowCount = 1 + globalHeight / yDivision;
+		int colCount = 1 + globalWidth / xDivision;
+
+		int[][] result = new int[rowCount][colCount];
 
 		int robotCount = positionX.size();
 		for(int robot = 0; robot < robotCount; robot++) {
 
-			String result = "";
+			// better here to say that the top and left are indexed as
+			// 1 and not 0; can then say that zero modulus positions
+			// are the borders
+			int xp = 1 + positionX.get(robot);
+			int yp = 1 + positionY.get(robot);
 
-			int tx = positionX.get(robot);
-			int ty = positionY.get(robot);
+			if(xp % xDivision == 0 || yp % yDivision == 0) continue; // don't count points on borders
 
-			if(tx == dmzColumn || ty == dmzRow) {
-				result += "DMZ";
-			} else {
-				result += ty < dmzRow ? "TOP" : "BOTTOM";
-				result += " ";
-				result += tx < dmzColumn ? "LEFT" : "RIGHT";
-			}
-			quadrants.add(result);
+			result[yp/yDivision][xp/xDivision]++;
 
-		} // robot for-loop
+		} // loop over the robots
 
-		return quadrants;
-
-	} // getQuadrants method
+		return result;
+	}
 
 
 
-	public static int safetyFactor(ArrayList<String> quadrants) {
-		int topLeft = 0, topRight = 0, bottomLeft = 0, bottomRight = 0;
-		for(String str : quadrants) {
-			switch(str) {
-				case "DMZ":break;
-				case "TOP LEFT":topLeft++;break;
-				case "TOP RIGHT":topRight++;break;
-				case "BOTTOM LEFT":bottomLeft++;break;
-				case "BOTTOM RIGHT":bottomRight++;break;
+	public static long latticeProduct(int[][] breakdown) {
+
+	/*
+		Attempts to divide the grid up into boxes of the specified dimensions.
+		There will be a row or column of border between boxes. At the right
+		or bottom of the grid, the possibilities are either:
+		- the box dimension requested is larger than the grid, and no borders used
+		- the box dimension requested is equal to the grid, and no borders used
+		- a row or column of border running along the outside
+		- a "perfect" subdivision, in the case that the global dimension is
+		  one less than a multiple of the border dimension
+		- the final box is curtailed
+
+	*/
+
+		int rows = breakdown.length;
+		int cols = breakdown[0].length;
+
+		long result = 1L;
+
+		for(int i = 0; i < rows; i++) {
+			for(int j = 0; j < cols; j++) {
+				result *= breakdown[i][j];
 			}
 		}
-		return topLeft * topRight * bottomLeft * bottomRight;
 
-	} // safetyFactor method
+		return result;
+	}
 
 
 
-	public static void displayArray(ArrayList<Integer> x, ArrayList<Integer> y) {
+	public static void displayArray(ArrayList<Integer> x, ArrayList<Integer> y, int height, int width, int time) {
 
-		int height = 3;
-		int width = 12;
+		boolean[][] results = new boolean[height][width];
 
-		int[][] results = new int[height][width];
+		for(int index = 0; index < x.size(); index++)
+			results[y.get(index)][x.get(index)] = true;
 
-		for(int index = 0; index < x.size(); index++) {
-			results[y.get(index)][x.get(index)] = 1;
-
-		}
+		System.out.println("NOW SHOWING RESULTS FOR TIME: " + time );
+		System.out.println("====================================================");
 
 		for(int i = 0; i < height; i++) {
-			for(int j = 0; j < width; j++) {
-				System.out.print(results[i][j]);
-			}
+			for(int j = 0; j < width; j++)
+				System.out.print(results[i][j] ? "X" : " ");
+
 			System.out.println();
 		}
+
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Continue?");
+		String input = sc.next();
+
 	} // displayArray method
 
 
 
 	public static void main(String[] args) {
+
+		boolean part1 = true;
+		int width = 101;
+		int height = 103;
 
 		String path = "Y:\\code\\java\\AdventOfCode\\Day14input.dat";
 		ArrayList<Integer> positionX = new ArrayList<Integer>();
@@ -172,18 +201,28 @@ class Day14 {
 		ArrayList<Integer> velocityY = new ArrayList<Integer>();
 		populateFromFile(path, positionX, positionY, velocityX, velocityY);
 
-		int width = 101;
-		int height = 103;
-		int time = 100;
+		if(part1) {
+			evolve(height, width, 100, velocityX, velocityY, positionX, positionY);
+			int[][] segregation = divisions (height, width, height / 2, width / 2, positionX, positionY);
+			System.out.println("Part 1 answer: " + latticeProduct(segregation));
+		} else {
 
-		evolve(height, width, time, velocityX, velocityY, positionX, positionY);
-		ArrayList<String> quadrants = getQuadrants(height, width, positionX, positionY);
-		System.out.println("Part 1 answer: " + safetyFactor(quadrants));
+			// every robot's x-periodicity has to be a fraction of width; likewise y and height
+			// thus there can only ever be height * width distinct overall states before it repeats
+			int maxTime = height * width;
 
-		//displayArray();
+			for(int time = 0; time < maxTime; time++) {
+
+				// let's hope that the xmas tree pic will entail blank space in other areas -
+				// checking for a 6x6 lattice with at least one of its blocks empty:
+				int[][] segregation = divisions (height, width, height / 6, width / 6, positionX, positionY);
+				if(0 == latticeProduct(segregation)) displayArray(positionX, positionY, height, width, time);
+
+				evolve(height, width, 1, velocityX, velocityY, positionX, positionY);
+			} // single time-step loop
+
+		} // part1 / part2 if
 
 	} // main method
-
-
 
 } // Day13 class
