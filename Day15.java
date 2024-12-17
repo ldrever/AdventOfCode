@@ -19,13 +19,14 @@ class Day15 {
 
 
 	public static void main(String[] args) {
-		boolean isPart1 = true;
+		boolean isPart1 = false;
+		String filePath = isPart1 ?  "Y:\\code\\java\\AdventOfCode\\Day15input.dat": "Y:\\code\\java\\AdventOfCode\\Day15large.dat";
 		String controls = "";
 		LetterGrid lg = null;
 
 		try {
 			controls = getControls("Y:\\code\\java\\AdventOfCode\\Day15control.dat");
-			lg = new LetterGrid("Y:\\code\\java\\AdventOfCode\\Day15input.dat");
+			lg = new LetterGrid(filePath);
 		}
 		catch (Exception e) {System.out.println("file processing error");}
 
@@ -33,7 +34,7 @@ class Day15 {
 		char[] ra = controls.toCharArray();
 
 		for(int i = 0; i < ra.length; i++) {
-			lg.evolve(ra[i]);
+			lg.evolve(ra[i], isPart1);
 			//lg.displayArray();
 		}
 

@@ -341,7 +341,7 @@ public class LetterGrid {
 
 
 
-	public void evolve(char next) {
+	public void evolve(char next, boolean isPart1) {
 		int dy = 0;
 		int dx = 0;
 
@@ -363,7 +363,15 @@ public class LetterGrid {
 			break;
 		} // switch char
 
-		this.successfulPush(this.robotRow, this.robotCol, dy, dx);
+		if(isPart1) {
+			this.successfulPush(this.robotRow, this.robotCol, dy, dx);
+
+		} else {
+			if(dy == 0)
+				this.successfulPush(this.robotRow, this.robotCol, dy, dx);
+			else
+				this.verticalPush(this.robotRow, this.robotCol, dy, dx);
+		}
 
 	} // evolve method
 
@@ -391,8 +399,10 @@ public class LetterGrid {
 
 
 
-	public HashSet<String> pushSet(int y, int x, int dy) {
+	public HashSet<String> getPushSet(int y, int x, int dy) {
 	/*
+		Note: only ever invoke this on the location of a '[' character!
+
 		When about to push a box in the vertical direction, first run this to
 		determine the full set of boxes that move. If the HashSet it returns
 		is empty, then the box can't be pushed.
@@ -443,20 +453,27 @@ public class LetterGrid {
 
 
 		// note that we can never invoke this function on anything but a BOX-LEFT location
-		if(leftGoal == boxLeft) leftSet = pushSet(y + dy, x, dy); // directly in-line situation
-		if(leftGoal == boxRight) leftSet = pushSet(y + dy, x - 1, dy);
-		if(rightGoal == boxLeft) rightSet = pushSet(y + dy, x + 1, dy);
+		if(leftGoal == boxLeft) leftSet = getPushSet(y + dy, x, dy); // directly in-line situation
+		if(leftGoal == boxRight) leftSet = getPushSet(y + dy, x - 1, dy);
+		if(rightGoal == boxLeft) rightSet = getPushSet(y + dy, x + 1, dy);
 
-		if(leftSet.size() == 0 || rightSet.size() == 0) return result; // still empty!
+		// cases where one goal-cell was free, but the other has an unpushable box
+		// (note that result is still empty here)
+		if(leftSet == null)
+			if(rightSet.size() == 0) return result;
 
-		// finally time to merge pushsets
+		if(rightSet == null)
+			if(leftSet.size() == 0) return result;
+
+		// having reached this point, we can be sure that movement will happen -
+		// time to merge pushsets
 		if(leftSet != null)	for(String str : leftSet) result.add(str);
 		if(rightSet != null) for(String str : rightSet) result.add(str);
 		result.add(this.paddedCoords(y, x));
 
 		return result;
 
-	} // pushSet method
+	} // getPushSet method
 
 
 
@@ -506,7 +523,7 @@ public class LetterGrid {
 
 	public boolean verticalPush(int y, int x, int dy, int dx) {
 		// this is always being executed on (y,x) being the robot's coords...
-
+		HashSet<String> pushSet = new HashSet<String>();
 		// find out what's immediately in front of him
 		switch (this.getCell(y + dy, x + dx)) {
 
@@ -515,18 +532,25 @@ public class LetterGrid {
 
 			case '.':
 				swapCells(y, x, y + dy, x + dx);
-
 				return true;
 
+			case '[':
+				pushSet = getPushSet(y + dy, x + dx, dy);
+				break;
 
-
-				// rab robot pos'n...
-
-
+			case ']':
+				pushSet = getPushSet(y + dy, x + dx - 1, dy);
+				break;
 
 		} // switch
-		return false;
+
+		if(pushSet.size() == 0) return false;
+		executePushes(pushSet, dy);
+		swapCells(y, x, y + dy, x + dx);
+		return true;
 	} // verticalPush method
+
+
 
 	public boolean successfulPush(int y, int x, int dy, int dx) {
 		// say that we WANT to move the object in the cell at (y, x) into the
