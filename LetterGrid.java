@@ -368,6 +368,17 @@ public class LetterGrid {
 	} // evolve method
 
 
+	public void swapCells(int y1, int x1, int y2, int x2) {
+
+		char c1 = this.getCell(y1, x1);
+		char c2 = this.getCell(y2, x2);
+
+		this.setCell(y1, x1, c2);
+		this.setCell(y2, x2, c1);
+
+	} // swapCells method
+
+
 
 	public HashSet<String> pushSet(int y, int x, int dy) {
 	/*
@@ -469,8 +480,7 @@ public class LetterGrid {
 					this.robotRow = y + dy;
 					this.robotCol = x + dx;
 				}
-				this.setCell(y + dy, x + dx, c);
-				this.setCell(y, x, '.');
+				this.swapCells(y, x, y + dy, x + dx);
 				return true;
 
 		} // switch
