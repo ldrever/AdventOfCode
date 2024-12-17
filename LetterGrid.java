@@ -341,7 +341,7 @@ public class LetterGrid {
 
 
 
-	public void evolve(char next, boolean isPart1) {
+	public void evolve(char next, boolean isPart1, boolean debug) {
 		int dy = 0;
 		int dx = 0;
 
@@ -370,8 +370,11 @@ public class LetterGrid {
 			if(dy == 0)
 				this.successfulPush(this.robotRow, this.robotCol, dy, dx);
 			else
-				this.verticalPush(this.robotRow, this.robotCol, dy, dx);
+				this.verticalPush(this.robotRow, this.robotCol, dy, dx, debug);
 		}
+
+		if(debug) this.displayArray();
+
 
 	} // evolve method
 
@@ -399,8 +402,13 @@ public class LetterGrid {
 
 
 
-	public HashSet<String> getPushSet(int y, int x, int dy) {
+	public HashSet<String> getPushSet(int y, int x, int dy, boolean debug) {
+
+		if(this.getCell(y, x) != '[') y = 1/0;
 	/*
+		Note: unlike other methods, this is invoked on the location of
+		a box, NOT the robot.
+
 		Note: only ever invoke this on the location of a '[' character!
 
 		When about to push a box in the vertical direction, first run this to
@@ -453,9 +461,9 @@ public class LetterGrid {
 
 
 		// note that we can never invoke this function on anything but a BOX-LEFT location
-		if(leftGoal == boxLeft) leftSet = getPushSet(y + dy, x, dy); // directly in-line situation
-		if(leftGoal == boxRight) leftSet = getPushSet(y + dy, x - 1, dy);
-		if(rightGoal == boxLeft) rightSet = getPushSet(y + dy, x + 1, dy);
+		if(leftGoal == boxLeft) leftSet = getPushSet(y + dy, x, dy, debug); // directly in-line situation
+		if(leftGoal == boxRight) leftSet = getPushSet(y + dy, x - 1, dy, debug);
+		if(rightGoal == boxLeft) rightSet = getPushSet(y + dy, x + 1, dy, debug);
 
 		// cases where one goal-cell was free, but the other has an unpushable box
 		// (note that result is still empty here)
@@ -467,8 +475,8 @@ public class LetterGrid {
 
 		// having reached this point, we can be sure that movement will happen -
 		// time to merge pushsets
-		if(leftSet != null)	for(String str : leftSet) result.add(str);
-		if(rightSet != null) for(String str : rightSet) result.add(str);
+		if(leftSet != null)	{for(String str : leftSet) result.add(str);}
+		if(rightSet != null) {for(String str : rightSet) result.add(str);}
 		result.add(this.paddedCoords(y, x));
 
 		return result;
@@ -492,6 +500,16 @@ public class LetterGrid {
 
 	} // paddedCoords method
 
+
+	public static void displayOrderedPushSet(HashSet<String> pushSet, int dy) {
+
+		List<String> list = new ArrayList<String>(pushSet);
+		Collections.sort(list);
+		if(dy > 0) Collections.reverse(list);
+		System.out.print("Pushset here: " );
+		System.out.println(list.toString());
+
+	} // displayOrderedPushSet method
 
 
 	public void executePushes(HashSet<String> pushSet, int dy) {
@@ -521,7 +539,7 @@ public class LetterGrid {
 	} // executePushes method
 
 
-	public boolean verticalPush(int y, int x, int dy, int dx) {
+	public boolean verticalPush(int y, int x, int dy, int dx, boolean debug) {
 		// this is always being executed on (y,x) being the robot's coords...
 		HashSet<String> pushSet = new HashSet<String>();
 		// find out what's immediately in front of him
@@ -535,11 +553,12 @@ public class LetterGrid {
 				return true;
 
 			case '[':
-				pushSet = getPushSet(y + dy, x + dx, dy);
+				pushSet = getPushSet(y + dy, x + dx, dy, debug);
 				break;
 
 			case ']':
-				pushSet = getPushSet(y + dy, x + dx - 1, dy);
+				pushSet = getPushSet(y + dy, x + dx - 1, dy, debug);
+				if(debug) displayOrderedPushSet(pushSet, dy);
 				break;
 
 		} // switch
@@ -560,7 +579,8 @@ public class LetterGrid {
 		switch (this.getCell(y + dy, x + dx)) {
 			case '#':
 				return false;
-
+			case ']': // intentionally drop through to O
+			case '[': // likewise
 			case 'O':
 				// recurse
 				if(!this.successfulPush(y + dy, x + dx, dy, dx)) return false;
@@ -585,11 +605,6 @@ public class LetterGrid {
 			System.out.println();
 		}
 
-
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Continue?");
-		String input = sc.next();
-		sc.close();
 	} // displayArray method
 
 }
