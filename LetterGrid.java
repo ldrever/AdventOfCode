@@ -370,11 +370,22 @@ public class LetterGrid {
 
 	public void swapCells(int y1, int x1, int y2, int x2) {
 
+		// obvious part
 		char c1 = this.getCell(y1, x1);
 		char c2 = this.getCell(y2, x2);
 
 		this.setCell(y1, x1, c2);
 		this.setCell(y2, x2, c1);
+
+		// update the robot	position if applicable
+		if(y1 == this.robotRow && x1 == this.robotCol) {
+			this.robotRow = y2;
+			this.robotCol = x2;
+		} else if(y2 == this.robotRow && x2 == this.robotCol) {
+			this.robotRow = y1;
+			this.robotCol = x1;
+		}
+
 
 	} // swapCells method
 
@@ -416,8 +427,6 @@ public class LetterGrid {
 		char boxLeft = '[';
 		char boxRight = ']';
 
-
-
 		char leftGoal = this.getCell(y + dy, x);
 		char rightGoal = this.getCell(y + dy, x + 1);
 
@@ -425,7 +434,7 @@ public class LetterGrid {
 
 		if(leftGoal == wall || rightGoal == wall) return result;
 		if(leftGoal == free && rightGoal == free) {
-			result.add("(" + y + "," + x + ")"); // we can ONLY invoke this method on the left-hand side of any block
+			result.add(this.paddedCoords(y, x)); // we can ONLY invoke this method on the left-hand side of any block
 			return result;
 		}
 
@@ -443,11 +452,29 @@ public class LetterGrid {
 		// finally time to merge pushsets
 		if(leftSet != null)	for(String str : leftSet) result.add(str);
 		if(rightSet != null) for(String str : rightSet) result.add(str);
-		result.add("(" + y + "," + x + ")");
+		result.add(this.paddedCoords(y, x));
 
 		return result;
 
 	} // pushSet method
+
+
+
+	public String paddedCoords(int y, int x) {
+		// motivation here is that we sort coordinates as strings, hence
+		// don't want (10,2) appearing before (2,2) etc.
+
+		int max = Math.max(this.height, this.width);
+		String longEnough = "" + max;
+		int digits = longEnough.length();
+
+		String strFormat = "%0" + digits + "d";
+		String strY = String.format(strFormat, y);
+		String strX = String.format(strFormat, x);
+		return "(" + strY + "," + strX + ")";
+
+	} // paddedCoords method
+
 
 
 	public void executePushes(HashSet<String> pushSet, int dy) {
@@ -456,9 +483,50 @@ public class LetterGrid {
 		// direction of dy, then we can just move them all by invoking a
 		// swap-with-free-space trick...
 
+		List<String> list = new ArrayList<String>(pushSet);
+		Collections.sort(list);
+		if(dy > 0) Collections.reverse(list);
 
+		// System.out.println(list.toString());
+
+		for(String str : list) {
+
+			String noBrackets = str.substring(1, str.length() - 1);
+			String [] ra = noBrackets.split(",");
+			int y = Integer.parseInt(ra[0]);
+			int x = Integer.parseInt(ra[1]);
+
+			swapCells(y, x, y + dy, x); // move the [-character
+			swapCells(y, x + 1, y + dy, x + 1); // move the ]-character
+
+		} // str in list loop
 
 	} // executePushes method
+
+
+	public boolean verticalPush(int y, int x, int dy, int dx) {
+		// this is always being executed on (y,x) being the robot's coords...
+
+		// find out what's immediately in front of him
+		switch (this.getCell(y + dy, x + dx)) {
+
+			case '#':
+				return false;
+
+			case '.':
+				swapCells(y, x, y + dy, x + dx);
+
+				return true;
+
+
+
+				// rab robot pos'n...
+
+
+
+		} // switch
+		return false;
+	} // verticalPush method
 
 	public boolean successfulPush(int y, int x, int dy, int dx) {
 		// say that we WANT to move the object in the cell at (y, x) into the
@@ -475,11 +543,6 @@ public class LetterGrid {
 				// intentionally no break
 
 			case '.':
-				char c = this.getCell(y, x);
-				if ('@' == c) {
-					this.robotRow = y + dy;
-					this.robotCol = x + dx;
-				}
 				this.swapCells(y, x, y + dy, x + dx);
 				return true;
 
