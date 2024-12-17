@@ -2,7 +2,7 @@ import java.util.Scanner;
 import java.nio.file.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class LetterGrid {
 
@@ -368,41 +368,86 @@ public class LetterGrid {
 	} // evolve method
 
 
-	public boolean isMovable(int y, int x, int dy) {
 
-		// double-width boxes means we need a two-pass approach -
-		// once to determine the possibility of moving, and
-		// another to execute it
+	public HashSet<String> pushSet(int y, int x, int dy) {
+	/*
+		When about to push a box in the vertical direction, first run this to
+		determine the full set of boxes that move. If the HashSet it returns
+		is empty, then the box can't be pushed.
 
-		// so let's recursively determine the movability of a box
-		// whose left OR right portion lies at (y, x)...
+		The key is that it recursively calls itself on one or both boxes that
+		lie in the way of THIS box. ("Goal-position left" and "goal-position
+		right".)
 
-		int left = x;
-		int right = x;
-		int row = y + dy;
+		Algorithm:
+		- if EITHER goal-position is a wall, return the empty set
+		- if BOTH goal-positions are free, then return the set of JUST THIS BLOCK
+		- if a SINGLE block stands in the way of BOTH goal-positions, then
+		  find the pushset for that block
+		  	- return an empty one if it is empty
+		  	- otherwise return it, with this block added on
+		- otherwise, iterate over one or both dependency-blocks:
+			- as soon as one returns the empty set, then also return the empty set
+			- if that never happens, then return the pushsets obtained from the
+			  dependency-blocks, PLUS this block
 
-		switch(this.getCell(y, x)) {
+		Note:
+		- this must only ever be invoked on the coordinates of the LEFT half of
+		  a box.
 
-			case '#':
-				return false;
+	*/
 
-			case '.':
-				return true;
+		HashSet<String> pushSet = new HashSet<String>();
 
-			case '[':
-				right++;
-				return isMovable(row, left, dy) && isMovable(row, right, dy);
-
-			case ']':
-				left--;
-				return isMovable(row, left, dy) && isMovable(row, right, dy);
-
-		} // switch
-		return false; // should not be reachable
-
-	} // boxNudge method
+		char wall = '#';
+		char free = '.';
+		char box = 'O';
+		char boxLeft = '[';
+		char boxRight = ']';
 
 
+
+		char leftGoal = this.getCell(y + dy, x);
+		char rightGoal = this.getCell(y + dy, x + 1);
+
+		HashSet<String> result = new HashSet<String>();
+
+		if(leftGoal == wall || rightGoal == wall) return result;
+		if(leftGoal == free && rightGoal == free) {
+			result.add("(" + y + "," + x + ")"); // we can ONLY invoke this method on the left-hand side of any block
+			return result;
+		}
+
+		HashSet<String> leftSet = null; // ie NOT empty
+		HashSet<String> rightSet = null;
+
+
+		// note that we can never invoke this function on anything but a BOX-LEFT location
+		if(leftGoal == boxLeft) leftSet = pushSet(y + dy, x, dy); // directly in-line situation
+		if(leftGoal == boxRight) leftSet = pushSet(y + dy, x - 1, dy);
+		if(rightGoal == boxLeft) rightSet = pushSet(y + dy, x + 1, dy);
+
+		if(leftSet.size() == 0 || rightSet.size() == 0) return result; // still empty!
+
+		// finally time to merge pushsets
+		if(leftSet != null)	for(String str : leftSet) result.add(str);
+		if(rightSet != null) for(String str : rightSet) result.add(str);
+		result.add("(" + y + "," + x + ")");
+
+		return result;
+
+	} // pushSet method
+
+
+	public void executePushes(HashSet<String> pushSet, int dy) {
+		// key insight here is that if we can just SORT the pushset first,
+		// such that values whose y-coordinate are the MOST extreme in the
+		// direction of dy, then we can just move them all by invoking a
+		// swap-with-free-space trick...
+
+
+
+	} // executePushes method
 
 	public boolean successfulPush(int y, int x, int dy, int dx) {
 		// say that we WANT to move the object in the cell at (y, x) into the

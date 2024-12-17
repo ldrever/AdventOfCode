@@ -19,12 +19,13 @@ class Day15 {
 
 
 	public static void main(String[] args) {
+		boolean isPart1 = true;
 		String controls = "";
 		LetterGrid lg = null;
 
 		try {
-			//controls = getControls("Y:\\code\\java\\AdventOfCode\\Day15control.dat");
-			lg = new LetterGrid("Y:\\code\\java\\AdventOfCode\\Day15small.dat");
+			controls = getControls("Y:\\code\\java\\AdventOfCode\\Day15control.dat");
+			lg = new LetterGrid("Y:\\code\\java\\AdventOfCode\\Day15input.dat");
 		}
 		catch (Exception e) {System.out.println("file processing error");}
 
@@ -36,7 +37,8 @@ class Day15 {
 			//lg.displayArray();
 		}
 
-		System.out.println(lg.sumGPS('['));
+		char box = isPart1 ? 'O' : '[';
+		System.out.println(lg.sumGPS(box));
 
 
 	} // main method
