@@ -12,6 +12,22 @@ public class LetterGrid {
 	private int endCol, endRow;
 	private volatile char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
 
+	public int getStartRow() {
+		return this.startRow;
+	}
+
+	public int getStartCol() {
+		return this.startCol;
+	}
+
+	public int getEndRow() {
+		return this.endRow;
+	}
+
+	public int getEndCol() {
+		return this.endCol;
+	}
+
 	public synchronized int getHeight() {
 		return this.height;
 	}
