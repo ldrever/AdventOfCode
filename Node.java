@@ -112,11 +112,11 @@ public class Node {
 
 				if(parentGrid.getCell(nextRow, nextColumn) == '#') {
 					// ignore walls
-					System.out.println("that's a wall.");
+					//System.out.println("that's a wall.");
 
 				} else if(this.didComeVia(nextRow, nextColumn)) {
 					// ignore ancestor nodes
-					System.out.println("already visited.");
+					//System.out.println("already visited.");
 
 				} else {
 					if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
