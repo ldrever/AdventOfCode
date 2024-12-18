@@ -37,13 +37,6 @@ class Day15 {
 		Scanner sc = new Scanner(System.in);
 
 		for(int i = 0; i < ra.length; i++) {
-			if(i == 656 && !isPart1) debug = true; // FIXME JEB
-			if(debug && !isPart1) { // FIXME JEB
-				System.out.print("Next move will be " + ra[i] + ". "); // FIXME JEB
-				System.out.println("Proceed with evolution " + i + "?"); // FIXME JEB
-				String input = sc.next(); // FIXME JEB
-				if(input.equalsIgnoreCase("N")) break; // FIXME JEB
-			}
 
 			lg.evolve(ra[i], isPart1, debug);
 

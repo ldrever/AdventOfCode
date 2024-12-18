@@ -438,46 +438,75 @@ public class LetterGrid {
 	*/
 
 		HashSet<String> pushSet = new HashSet<String>();
+		HashSet<String> result = new HashSet<String>();
+
+		// ie NOT empty
+		HashSet<String> dependencySet = null;
+		HashSet<String> leftSet = null;
+		HashSet<String> rightSet = null;
 
 		char wall = '#';
 		char free = '.';
-		char box = 'O';
 		char boxLeft = '[';
 		char boxRight = ']';
 
 		char leftGoal = this.getCell(y + dy, x);
 		char rightGoal = this.getCell(y + dy, x + 1);
 
-		HashSet<String> result = new HashSet<String>();
+		if(leftGoal == wall || rightGoal == wall)	{
+			// intentionally leave result empty
 
-		if(leftGoal == wall || rightGoal == wall) return result;
-		if(leftGoal == free && rightGoal == free) {
+		} else if(leftGoal == free && rightGoal == free) {
+			// no dependencies, but movable block? return itself
 			result.add(this.paddedCoords(y, x)); // we can ONLY invoke this method on the left-hand side of any block
-			return result;
+
+		} else if(leftGoal == boxLeft) {
+			// directly in-line
+			dependencySet = getPushSet(y + dy, x, dy, debug);
+			if(dependencySet.size() == 0) {
+				// cascade the empty pushset down
+			} else {
+				// return whatever the dependency had, plus this one
+				for(String str : dependencySet) result.add(str);
+				result.add(this.paddedCoords(y, x));
+			}
+
+		} else if(leftGoal == boxRight && rightGoal == free) {
+			// staggered to the left
+			dependencySet = getPushSet(y + dy, x - 1, dy, debug);
+			if(dependencySet.size() == 0) {
+				// cascade the empty pushset down
+			} else {
+				// return whatever the dependency had, plus this one
+				for(String str : dependencySet) result.add(str);
+				result.add(this.paddedCoords(y, x));
+			}
+
+		} else if(rightGoal == boxLeft && leftGoal == free) {
+			// staggered to the right
+			dependencySet = getPushSet(y + dy, x + 1, dy, debug);
+			if(dependencySet.size() == 0) {
+				// cascade the empty pushset down
+			} else {
+				// return whatever the dependency had, plus this one
+				for(String str : dependencySet) result.add(str);
+				result.add(this.paddedCoords(y, x));
+			}
+
+		} else if(leftGoal == boxRight && rightGoal == boxLeft) {
+			// double dependency
+			leftSet = getPushSet(y + dy, x - 1, dy, debug);
+			rightSet = getPushSet(y + dy, x + 1, dy, debug);
+
+			if(leftSet.size() == 0 || rightSet.size() == 0) {
+				// cascade the empty pushset down
+			} else {
+				for(String str : leftSet) result.add(str);
+				for(String str : rightSet) result.add(str);
+				result.add(this.paddedCoords(y, x));
+			}
+
 		}
-
-		HashSet<String> leftSet = null; // ie NOT empty
-		HashSet<String> rightSet = null;
-
-
-		// note that we can never invoke this function on anything but a BOX-LEFT location
-		if(leftGoal == boxLeft) leftSet = getPushSet(y + dy, x, dy, debug); // directly in-line situation
-		if(leftGoal == boxRight) leftSet = getPushSet(y + dy, x - 1, dy, debug);
-		if(rightGoal == boxLeft) rightSet = getPushSet(y + dy, x + 1, dy, debug);
-
-		// cases where one goal-cell was free, but the other has an unpushable box
-		// (note that result is still empty here)
-		if(leftSet == null)
-			if(rightSet.size() == 0) return result;
-
-		if(rightSet == null)
-			if(leftSet.size() == 0) return result;
-
-		// having reached this point, we can be sure that movement will happen -
-		// time to merge pushsets
-		if(leftSet != null)	{for(String str : leftSet) result.add(str);}
-		if(rightSet != null) {for(String str : rightSet) result.add(str);}
-		result.add(this.paddedCoords(y, x));
 
 		return result;
 
@@ -502,6 +531,7 @@ public class LetterGrid {
 
 
 	public static void displayOrderedPushSet(HashSet<String> pushSet, int dy) {
+		if(pushSet.size() == 0) return;
 
 		List<String> list = new ArrayList<String>(pushSet);
 		Collections.sort(list);
