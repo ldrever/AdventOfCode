@@ -8,6 +8,8 @@ public class LetterGrid {
 
 	private volatile int height, width;
 	private int robotCol, robotRow;
+	private int startCol, startRow;
+	private int endCol, endRow;
 	private volatile char[][] grid; // LIKE A MATRIX - FIRST COUNTER VERTICAL, SECOND COUNTER HORIZONTAL
 
 	public synchronized int getHeight() {
@@ -319,8 +321,6 @@ public class LetterGrid {
 
 	} // sumGPS method
 
-
-
 	public void findRobot(boolean debug) {
 
 		for(int row = 0; row < this.height; row++) {
@@ -330,14 +330,49 @@ public class LetterGrid {
 				if(cellChar == '@') {
 					this.robotCol = column;
 					this.robotRow = row;
-
 					if (debug) System.out.println("New map. robot starts at (" + row + ", " + column + ")");
-
 					return;
 				}
 			}
 		}
 	} // findRobot method
+
+	public void findStart(boolean debug) {
+
+		for(int row = 0; row < this.height; row++) {
+			for(int column = 0; column < this.width; column++) {
+
+				char cellChar = this.getCell(row,column);
+				if(cellChar == 'S') {
+					this.startCol = column;
+					this.startRow = row;
+					if (debug) System.out.println("New map. deer starts at (" + row + ", " + column + ")");
+					return;
+				}
+			}
+		}
+	} // findStart method
+
+
+
+
+
+
+	public void findEnd(boolean debug) {
+
+		for(int row = 0; row < this.height; row++) {
+			for(int column = 0; column < this.width; column++) {
+
+				char cellChar = this.getCell(row,column);
+				if(cellChar == 'E') {
+					this.endCol = column;
+					this.endRow = row;
+					if (debug) System.out.println("New map. deer ends at (" + row + ", " + column + ")");
+					return;
+				}
+			}
+		}
+	} // findEnd method
 
 
 
