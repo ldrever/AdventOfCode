@@ -3,8 +3,6 @@ import java.io.*;
 
 class Day15 {
 
-
-
 	public static String getControls(String filePath) throws Exception {
 
 		Scanner diskScanner = new Scanner(new File(filePath));
@@ -14,7 +12,6 @@ class Day15 {
 
 		diskScanner.close();
 		return text;
-
 	}
 
 
@@ -46,7 +43,6 @@ class Day15 {
 		char box = isPart1 ? 'O' : '[';
 		System.out.println(lg.sumGPS(box));
 
-
 	} // main method
 
-} // Day13 class
+} // Day15 class

@@ -472,7 +472,7 @@ public class LetterGrid {
 			}
 
 		} else if(leftGoal == boxRight && rightGoal == free) {
-			// staggered to the left
+			// dependency staggered to the left
 			dependencySet = getPushSet(y + dy, x - 1, dy, debug);
 			if(dependencySet.size() == 0) {
 				// cascade the empty pushset down
@@ -483,7 +483,7 @@ public class LetterGrid {
 			}
 
 		} else if(rightGoal == boxLeft && leftGoal == free) {
-			// staggered to the right
+			// dependency staggered to the right
 			dependencySet = getPushSet(y + dy, x + 1, dy, debug);
 			if(dependencySet.size() == 0) {
 				// cascade the empty pushset down
@@ -530,6 +530,7 @@ public class LetterGrid {
 	} // paddedCoords method
 
 
+
 	public static void displayOrderedPushSet(HashSet<String> pushSet, int dy) {
 		if(pushSet.size() == 0) return;
 
@@ -540,6 +541,7 @@ public class LetterGrid {
 		System.out.println(list.toString());
 
 	} // displayOrderedPushSet method
+
 
 
 	public void executePushes(HashSet<String> pushSet, int dy) {
