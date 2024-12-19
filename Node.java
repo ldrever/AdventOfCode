@@ -8,26 +8,30 @@ public class Node {
 	private int column;
 	private Node parent;
 	private ArrayList<Node> children;
-	private int score;
 	private LetterGrid parentGrid;
 	private boolean isProcessed;
 	private int arrivalDy;
 	private int arrivalDx;
 	private int turnCount;
+	private int stepCount;
+
 
 	// getters
 	public int getRow() {return this.row;}
 	public int getColumn() {return this.column;}
 	public Node getParent() {return this.parent;}
 	public ArrayList<Node> getChildren() {return this.children;}
-	public int getScore() {return this.score;}
 	public LetterGrid getParentGrid() {return this.parentGrid;}
 	public boolean hasBeenProcessed() {return this.isProcessed;}
 	public int getTurnCount() {return this.turnCount;}
+	public int getStepCount() {return this.stepCount;}
+
+	public int getScore() {return this.stepCount + 1000 * this.turnCount;}
 
 	// setters
 	public void setProcessedState(boolean isProcessed) {this.isProcessed = isProcessed;}
 	public void setTurnCount(int turnCount) {this.turnCount = turnCount;}
+	public void setStepCount(int stepCount) {this.stepCount = stepCount;}
 
 	// constructor
 	public Node(int row, int column, Node parent, LetterGrid parentGrid, int arrivalDy, int arrivalDx) {
@@ -133,6 +137,7 @@ public class Node {
 					boolean corner = (this.arrivalDy != dy || this.arrivalDx != dx);
 
 					newNode.setTurnCount(corner ? turnsSoFar + 1 : turnsSoFar);
+					newNode.setStepCount(this.getStepCount() + 1);
 
 
 

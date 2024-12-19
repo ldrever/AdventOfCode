@@ -16,6 +16,11 @@ class Day16 {
 				if(node.isEndCell()) {
 					System.out.println(node.traceRoute());
 					System.out.println(node.getTurnCount() + " turns needed.");
+
+					System.out.println(node.getStepCount() + " steps needed.");
+
+					System.out.println("Scoring " + node.getScore());
+
 					System.out.println();
 
 					Node currentNode = node;
