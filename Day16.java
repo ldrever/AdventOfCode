@@ -15,6 +15,7 @@ class Day16 {
 			} else {
 				if(node.isEndCell()) {
 					System.out.println(node.traceRoute());
+					System.out.println(node.getTurnCount() + " turns needed.");
 					System.out.println();
 
 					Node currentNode = node;
@@ -76,7 +77,9 @@ class Day16 {
 		lg.findEnd(true);
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
-		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), null, lg);
+		int arrivalDy = 0;
+		int arrivalDx = 1; // start facing East
+		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), null, lg, arrivalDy, arrivalDx);
 		nodes.add(origin);
 
 		int safetyCounter = 0;

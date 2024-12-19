@@ -11,6 +11,9 @@ public class Node {
 	private int score;
 	private LetterGrid parentGrid;
 	private boolean isProcessed;
+	private int arrivalDy;
+	private int arrivalDx;
+	private int turnCount;
 
 	// getters
 	public int getRow() {return this.row;}
@@ -20,12 +23,14 @@ public class Node {
 	public int getScore() {return this.score;}
 	public LetterGrid getParentGrid() {return this.parentGrid;}
 	public boolean hasBeenProcessed() {return this.isProcessed;}
+	public int getTurnCount() {return this.turnCount;}
 
 	// setters
 	public void setProcessedState(boolean isProcessed) {this.isProcessed = isProcessed;}
+	public void setTurnCount(int turnCount) {this.turnCount = turnCount;}
 
 	// constructor
-	public Node(int row, int column, Node parent, LetterGrid parentGrid) {
+	public Node(int row, int column, Node parent, LetterGrid parentGrid, int arrivalDy, int arrivalDx) {
 		this.row = row;
 		this.column = column;
 		this.parent = parent;
@@ -36,6 +41,8 @@ public class Node {
 
 		this.parentGrid = parentGrid;
 		this.isProcessed = false;
+		this.arrivalDy = arrivalDy;
+		this.arrivalDx = arrivalDx;
 
 	} // constructor
 
@@ -87,9 +94,9 @@ public class Node {
 	} // didComeVia method
 
 
-	public Node spawnAt(int spawnRow, int spawnColumn) {
+	public Node spawnAt(int spawnRow, int spawnColumn, int arrivalDy, int arrivalDx) {
 
-		Node newNode = new Node(spawnRow, spawnColumn, this, this.parentGrid);
+		Node newNode = new Node(spawnRow, spawnColumn, this, this.parentGrid, arrivalDy, arrivalDx);
 		this.children.add(newNode);
 		return newNode;
 
@@ -120,7 +127,16 @@ public class Node {
 
 				} else {
 					if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
-					Node newNode = this.spawnAt(nextRow, nextColumn);
+					Node newNode = this.spawnAt(nextRow, nextColumn, dy, dx);
+
+					int turnsSoFar = this.getTurnCount();
+					boolean corner = (this.arrivalDy != dy || this.arrivalDx != dx);
+
+					newNode.setTurnCount(corner ? turnsSoFar + 1 : turnsSoFar);
+
+
+
+
 					output.add(newNode);
 				}
 
