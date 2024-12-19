@@ -3,7 +3,7 @@ import java.io.*;
 
 class Day16 {
 
-	public static boolean extend(ArrayList<Node> nodes, boolean debug) {
+	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug) {
 		boolean result = false;
 
 		for(int i = nodes.size() - 1; i >= 0; i--) {
@@ -19,7 +19,9 @@ class Day16 {
 
 					System.out.println(node.getStepCount() + " steps needed.");
 
-					System.out.println("Scoring " + node.getScore());
+					int score = node.getScore();
+					System.out.println("Scoring " + score);
+					scores.add(score);
 
 					System.out.println();
 
@@ -69,7 +71,7 @@ class Day16 {
 		boolean debug = false;
 		boolean isPart1 = true;
 
-		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16small.dat"; // FIXME second needs small -> input
+		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16input.dat"; // FIXME second needs small -> input
 		LetterGrid lg = null;
 
 		try {
@@ -82,6 +84,8 @@ class Day16 {
 		lg.findEnd(true);
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
+		ArrayList<Integer> scores = new ArrayList<Integer>();
+
 		int arrivalDy = 0;
 		int arrivalDx = 1; // start facing East
 		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), null, lg, arrivalDy, arrivalDx);
@@ -89,11 +93,21 @@ class Day16 {
 
 		int safetyCounter = 0;
 
-		while(safetyCounter < 20000) {
+		while(safetyCounter < 10_000_000) {
 			safetyCounter++;
-			boolean result = extend(nodes, debug);
+			boolean result = extend(nodes, scores, debug);
 			if(!result) break;
 		}
+
+		int bestScore = Integer.MAX_VALUE;
+
+		for(int score : scores) {
+			if(score < bestScore) {
+				bestScore = score;
+			}
+		}
+
+		System.out.println("BEST POSSIBLE SCORE HERE: " + bestScore);
 
 
 
