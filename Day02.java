@@ -38,8 +38,8 @@ public class Day02 {
 		return true;
 	}
 
-
-	public static void main(String args[]) throws IOException {
+	public static long answer(int part, boolean debug) throws IOException {
+//	public static void main(String args[]) throws IOException {
 
 		ArrayList<String> inputLines = new ArrayList<>();
 		Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\Day02input.dat"));
@@ -50,7 +50,8 @@ public class Day02 {
 
 		diskScanner.close();
 
-		int safeCount = 0;
+		int part1SafeCount = 0;
+		int part2SafeCount = 0;
 
 		for (String inputLine : inputLines) {
 
@@ -62,6 +63,7 @@ public class Day02 {
 			}
 
 			boolean isSafe = isSafe(levels);
+			part1SafeCount += isSafe ? 1 : 0;
 
 			int i = 0;
 			while ((!isSafe) && i < levels.size()) {
@@ -72,12 +74,15 @@ public class Day02 {
 				i++;
 			}
 
-			safeCount += isSafe ? 1 : 0;
+			part2SafeCount += isSafe ? 1 : 0;
 
 		}
+/*
+		System.out.println(part1SafeCount + " safe ones detected for part 1.");
+		System.out.println(part2SafeCount + " safe ones detected for part 2.");
+		*/
 
-		System.out.println(safeCount + " safe ones detected.");
-
+		return (part == 1) ? part1SafeCount : part2SafeCount;
 	}
 
 }

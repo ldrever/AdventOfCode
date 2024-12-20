@@ -6,7 +6,11 @@ import java.util.ArrayList;
 
 public class Day01 {
 
-	public static void main(String args[]) throws IOException {
+	public static int return57() {
+		return 59;
+	}
+
+	public static long answer(int part, boolean debug) throws IOException {
 
 		ArrayList<String> inputLines = new ArrayList<>();
 		Scanner diskScanner = new Scanner(new File("Y:\\code\\java\\AdventOfCode\\Day01input.dat"));
@@ -42,7 +46,8 @@ public class Day01 {
 			total += Math.abs(leftColumn.get(j) - rightColumn.get(j));
 		}
 
-		System.out.println("total (answer for part one): " + total);
+		if(part == 1) return total;
+		//System.out.println("total (answer for part one): " + total);
 
 		/*
 
@@ -76,8 +81,10 @@ public class Day01 {
 
 		} while (leftPosition < size && rightPosition < size);
 
-		System.out.println ("similarity score: " + score);
+		//System.out.println ("similarity score: " + score);
+		if(part == 2) return score;
 
+		return -1; // means there's a problem
 	}
 
 }
