@@ -129,18 +129,23 @@ public class Day08 {
 
 
 
-	public static void main(String[] args) {
+	public static long answer(int part, boolean debug) throws Exception {
 
-		boolean debug = false;
+//	public static void main(String[] args) {
+
+		//boolean debug = false;
 		LetterGrid map = processFile();
 		if(debug) System.out.println(map.getHeight() + "*" + map.getWidth() + " map successfully loaded");
 		HashMap<Character, ArrayList<Point>> antennae = getAntennae(debug, map);
-
+/*
 		int problemPart = 1;
 		System.out.println("Total unique antinodes for part " + problemPart + ": " + countAntinodes(debug, problemPart, antennae));
 
 		problemPart = 2;
 		System.out.println("Total unique antinodes for part " + problemPart + ": " + countAntinodes(debug, problemPart, antennae));
+*/
+
+		return countAntinodes(debug, part, antennae);
 
 	} // main method
 

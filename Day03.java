@@ -1,5 +1,6 @@
 import java.nio.file.*;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,9 +95,22 @@ public class Day03 {
 	}
 
 
-	public static void main(String args[]) throws IOException {
-		Path path = Path.of("Y:\\code\\java\\AdventOfCode\\Day03input.dat");
-		String content = Files.readString(path);
+	public static String getInput(String filePath) throws Exception {
+
+		Scanner diskScanner = new Scanner(new File(filePath));
+		String text = "";
+		while (diskScanner.hasNext())
+			text += diskScanner.nextLine();
+
+		diskScanner.close();
+		return text;
+	}
+
+	public static long answer(int part, boolean debug) throws Exception {
+//	public static void main(String args[]) throws Exception {
+//		int part = 1;
+
+		String content = getInput("Y:\\code\\java\\AdventOfCode\\Day03input.dat");
 
 		String needle = "(mul\\([0-9]{1,3}\\,[0-9]{1,3}\\)|do)"; // negative values out of scope
 
@@ -117,27 +131,28 @@ public class Day03 {
 			if (result.equalsIgnoreCase("do")) {
 
 				if(content.substring(start, end + 3).equalsIgnoreCase("don't")) {
-					System.out.println("Entering INVALID mode following encounter of 'don't' at characters " + start + " through " + (end + 1));
+					if(debug) System.out.println("Entering INVALID mode following encounter of 'don't' at characters " + start + " through " + (end + 1));
 					state = "invalid";
 				} else {
-					System.out.println("Entering VALID mode following encounter of 'do' at characters " + start + " through " + (end - 1));
+					if(debug) System.out.println("Entering VALID mode following encounter of 'do' at characters " + start + " through " + (end - 1));
 					state = "valid";
 				}
 
 			}	else {
-					if(state.equalsIgnoreCase("valid")) {
+					if(state.equalsIgnoreCase("valid") || part == 1) {
 						results.add(result);
 						total += eval(result);
-						System.out.println("Valid: " + result);
+						if(debug) System.out.println("Valid: " + result);
 					} else if(state.equalsIgnoreCase("invalid")) {
-						System.out.println("Invalid: " + result);
+						if(debug) System.out.println("Invalid: " + result);
 					}
 			}
 
 			position = end;
 		}
 
-		System.out.println("Total: " + total);
+		//System.out.println("Total: " + total);
+		return total;
 
 	}
 

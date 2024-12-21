@@ -133,7 +133,7 @@ public class Day07 {
 
 
 
-	public static long answer(boolean debug, boolean allowConcat, boolean requestConf, ArrayList<Long> targets, ArrayList<ArrayList<Long>> sequences) {
+	public static long subAnswer(boolean debug, boolean allowConcat, boolean requestConf, ArrayList<Long> targets, ArrayList<ArrayList<Long>> sequences) {
 
 		Scanner sc = new Scanner(System.in);
 		long total = 0L;
@@ -152,7 +152,7 @@ public class Day07 {
 
 			if(hit.length() > 0) {
 				total += target;
-				if (debug) System.out.println("ANSWER:" + hit);
+				if (debug) System.out.println("subAnswer:" + hit);
 			} else {
 				if (debug) System.out.println("NOT POSSIBLE");
 			}
@@ -167,7 +167,7 @@ public class Day07 {
 
 		return total;
 
-	} // answer
+	} // subAnswer
 
 
 
@@ -200,26 +200,27 @@ public class Day07 {
 
 
 
-	public static void main(String[] args) {
+	public static long answer(int part, boolean debug) throws Exception {
+
+//	public static void main(String[] args) {
 
 		ArrayList<Long> targets = new ArrayList<Long>();
 		ArrayList<ArrayList<Long>> sequences = new ArrayList<ArrayList<Long>>();
 
 		boolean allowConcat;
-		boolean debug = false;
+		//boolean debug = false;
 		boolean requestConf = false;
 
 		processFile(targets, sequences);
 
-		// part 1
-		allowConcat = false;
-		System.out.print("Answer to part 1: ");
-		System.out.println(answer(debug, allowConcat, requestConf, targets, sequences));
+		if(part == 1) {
+			allowConcat = false;
+			return subAnswer(debug, allowConcat, requestConf, targets, sequences);
 
-		// part 2
-		System.out.print("Answer to part 2: ");
-		allowConcat = true; // for part 2
-		System.out.println(answer(debug, allowConcat, requestConf, targets, sequences));
+		} else {
+			allowConcat = true;
+			return subAnswer(debug, allowConcat, requestConf, targets, sequences);
+		}
 
 	} // main
 

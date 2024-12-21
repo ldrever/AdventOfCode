@@ -8,7 +8,9 @@ import java.util.ArrayList;
 
 public class Day06 {
 
-	public static void main(String[] args) {
+	public static long answer(int part, boolean debug) throws Exception {
+
+//		public static void main(String[] args) {
 
 		String path = "Y:\\code\\java\\AdventOfCode\\Day06input.dat";
 
@@ -22,7 +24,8 @@ public class Day06 {
 			}
 
 			int groundBreakings = map.getGroundBreakings();
-			System.out.println("X-count: " + groundBreakings);
+			//System.out.println("X-count: " + groundBreakings);
+			if(part == 1) return groundBreakings;
 
 			ArrayList<Integer> candidateRows = map.getPotentialBlockerRows();
 			ArrayList<Integer> candidateColumns = map.getPotentialBlockerColumns();
@@ -69,13 +72,15 @@ public class Day06 {
 
 			} // for over possible blockers
 
-			System.out.println("Blockers that resulted in loops: " + loopCount);
+			//System.out.println("Blockers that resulted in loops: " + loopCount);
+			if(part == 2) return loopCount;
 
 
 		} catch (IOException e) { // FIXME wrong location?
 			System.out.println("Problems loading file");
 		}
 
-	} // main
+			return -1;
+	} // answer
 
 } // class

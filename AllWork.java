@@ -4,11 +4,35 @@ import java.io.*;
 
 public class AllWork {
 
+	/*
+
+	Get used to pasting the two lines below:
+		public static long answer(int part, boolean debug) throws Exception {
+//
+
+
+	*/
+
 	public static void main(String[] args) throws IOException {
 
-		long[][] ra = {{2285373L,21142653L}
-					,{472,520}
-		/*			,{,}
+		long[][] ra = {{    2285373L,       21142653L}
+					,{          472L,            520L}
+					,{    182780583L,       90772405L}
+					,{         2551L,           1985L}
+					,{		   5166L,           4679L}
+					,{		   4939L,           1434L}
+					,{1708857123053L,189207836795655L}
+					,{			394L,           1277L}
+					,{6288599492129L,  6321896265143L}
+					,{          510L,           1058L}
+					,{       233050L,276661131175807L}
+					,{      1437300L,         849332L}
+		/*			,{29598L,93217456941970L}
+					,{,}
+					,{,}
+					,{,}
+					,{,}
+					,{,}
 					,{,}
 					,{,}
 					,{,}
@@ -48,10 +72,14 @@ public class AllWork {
 				} catch (Exception e) {System.out.println("problems getting a method");}
 				Long result = null;
 				try {
-					result = (Long) answerMethod.invoke(null, 1, false);
+					result = (Long) answerMethod.invoke(null, part, false);
 				} catch (Exception e) {System.out.println("problems RUNNING a method");}
 
 				System.out.println(result);
+				if(result == rightAnswer)
+					System.out.println("CORRECT!");
+				else
+					System.out.println("THIS IS NOT CORRECT!!!");
 
 			} // for-part loop
 

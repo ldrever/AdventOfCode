@@ -27,10 +27,13 @@ public class Day04 {
 	}
 
 
-
-	public static void main(String args[]) throws IOException {
+	public static long answer(int part, boolean debug) throws Exception {
+//	public static void main(String args[]) throws IOException {
 		// System.out.println(part1());
-		part2();
+		if(part == 1)
+			return (long) part1();
+		else
+			return (long) part2();
 	}
 
 
@@ -42,7 +45,7 @@ public class Day04 {
 		int width = lg.getWidth();
 		char[][] array = lg.getGrid();
 
-		System.out.println("Height: " + height + "; Width: " + width);
+		//System.out.println("Height: " + height + "; Width: " + width);
 
 		// NOW ASSUME A SQUARE GRID
 		final int noMarginLimit = height - 1;
@@ -63,7 +66,7 @@ public class Day04 {
 
 		for(MatrixDirection direction : directions) {
 
-			System.out.println("now working " + direction.name);
+			// System.out.println("now working " + direction.name);
 
 			for(int y = direction.top; y <= direction.bot; y++) {
 				for(int x = direction.left; x <= direction.right; x++) {
@@ -86,7 +89,7 @@ public class Day04 {
 	} // method
 
 
-		public static void part2() throws IOException {
+		public static int part2() throws IOException {
 
 			LetterGrid lg = new LetterGrid("Y:\\code\\java\\AdventOfCode\\Day04input.dat");
 
@@ -114,7 +117,7 @@ public class Day04 {
 
 			for(MatrixDirection direction : directions) {
 
-				System.out.println("now working " + direction.name);
+				//System.out.println("now working " + direction.name);
 
 				for(int y = direction.top; y <= direction.bot; y++) {
 					for(int x = direction.left; x <= direction.right; x++) {
@@ -164,7 +167,7 @@ public class Day04 {
 				} // j
 			} // i
 
-			System.out.println(results);
+			return (results);
 	} // method
 
 } // class

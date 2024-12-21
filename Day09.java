@@ -358,9 +358,11 @@ class Day09 {
 
 
 
-	public static void main(String[] args) {
+	public static long answer(int part, boolean debug) throws Exception {
 
-		boolean debug = false;
+//	public static void main(String[] args) {
+
+		//boolean debug = false;
 		String path = "Y:\\code\\java\\AdventOfCode\\Day09input.dat";
 		//String path = "Y:\\code\\java\\AdventOfCode\\Day09LD.dat";
 		char[] shortForm = fileToArray(path);
@@ -374,10 +376,17 @@ class Day09 {
 			}
 			System.out.println();
 		}
-		evolve2(debug, longForm);
+		//evolve2(debug, longForm);
 		//evolve(debug, longForm);
 
-		System.out.println("Checksum: " + checksum(longForm));
+		//System.out.println("Checksum: " + checksum(longForm));
+
+		if(part == 1)
+			evolve(debug, longForm);
+		else
+			evolve2(debug, longForm);
+
+		return checksum(longForm);
 
 	} // main method
 

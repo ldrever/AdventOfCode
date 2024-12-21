@@ -98,7 +98,7 @@ public class Day10 {
 					@SuppressWarnings("unchecked")
 					HashSet<String> hs = (HashSet<String>) peaks[row][column];
 					score += hs.size();
-					System.out.println("Valley at (" + row + "," + column + ") can reach the " + hs.size() + " peaks " + hs.toString());
+					//System.out.println("Valley at (" + row + "," + column + ") can reach the " + hs.size() + " peaks " + hs.toString());
 					// System.out.println("Logged new peak at " + peakText);
 				}
 
@@ -126,13 +126,15 @@ public class Day10 {
 
 
 
-	public static void main(String[] args) {
+	public static long answer(int part, boolean debug) throws Exception {
 
-		boolean debug = false;
+//	public static void main(String[] args) {
+
+//		boolean debug = false;
 		String path = "Y:\\code\\java\\AdventOfCode\\Day10input.dat";
 		LetterGrid elevations = processFile(debug, path);
 		LetterGrid scores = processFile(debug, path);
-		System.out.println(elevations.getHeight());
+		//System.out.println(elevations.getHeight());
 		//System.out.println(scores.getHeight());
 		//scores.wipe('0');
 
@@ -149,9 +151,11 @@ public class Day10 {
 
 		for(String s : hs) System.out.println(s);
 */
-
+/*
 		int part1score = propagate(debug, 2, elevations);
 		System.out.println("Therefore score is " + part1score);
+*/
+		return propagate(debug, part, elevations);
 
 	} // main method
 } // Day10 class

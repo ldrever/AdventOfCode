@@ -12,8 +12,9 @@ public class Day05 {
 	public static ArrayList<String> sequenceStrings;
 
 
+	public static long answer(int part, boolean debug) throws Exception {
 
-	public static void main(String[] args) {
+//	public static void main(String[] args) {
 
 		ArrayList<NumberSequence> goodies = new ArrayList<NumberSequence>();
 		ArrayList<NumberSequence> baddies = new ArrayList<NumberSequence>();
@@ -23,8 +24,12 @@ public class Day05 {
 		for (String sequenceString : sequenceStrings) goodies.add(new NumberSequence(sequenceString));
 		for(String rule : ruleStrings) purify(rule, goodies, baddies);
 
-		System.out.println("Answer to part 1: " + part1(goodies));
-		System.out.println("Answer to part 2: " + part2(baddies));
+		if(part == 1)
+			return part1(goodies);
+		else
+			return part2(baddies);
+//		System.out.println("Answer to part 1: " + part1(goodies));
+//		System.out.println("Answer to part 2: " + part2(baddies));
 
 	} // main
 

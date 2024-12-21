@@ -81,23 +81,29 @@ public class Day11 {
 
 
 
-	public static void main(String[] args) {
+	public static long answer(int part, boolean debug) throws Exception {
 
-		boolean debug = false;
+//	public static void main(String[] args) {
+
+//		boolean debug = false;
 		boolean allowNegativePowers = false;
 		int iterationsDesired = 75;
 		String path = "Y:\\code\\java\\AdventOfCode\\Day11input.dat";
 		StoneSet ss = loadFromFile(debug, path, iterationsDesired);
 
 		for(int i = 1; i <= iterationsDesired; i++) {
-			System.out.print("Size after " + i + " steps: ");
+			//System.out.print("Size after " + i + " steps: ");
 			ss.process(debug, allowNegativePowers);
 			try {
-				System.out.println(ss.evaluate());
+				//System.out.println(ss.evaluate());
+				if(i == 25 && part == 1) return ss.evaluate();
+				if(i == 75 && part == 2) return ss.evaluate();
 			} catch (Exception e) {
 				System.out.println("Could not evaluate");
 			}
 		}
+
+		return -1;
 
 	/*
 
