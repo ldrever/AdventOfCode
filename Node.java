@@ -203,6 +203,37 @@ public class Node {
 
 
 	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug) {
+		/*
+			Repeatedly applying this to a list of nodes will implement
+			depth-first-search (DFS).
+
+			- It starts with the most recently added node on the list.
+
+			- If it's the end-cell, then capture the score for the trip.
+			  (This does NOT typically end the process - it tries every
+			  possible way of walking the maze, and the end-cell can
+			  come up at the end of many different routes.)
+			- Also if it's the end-cell, then PRUNE THE BRANCH - i.e.,
+			  keep removing the nodes that led us to the end, UNTIL
+			  one is found that allows for a different path forwards.
+
+			- If it's a typical non-end-cell, we have this concept of "is
+			  it processed?". This just means "have we found its children
+			  and added THOSE to the list as well?". So a cell gets marked
+			  as "processed" once its children are added to the list -
+			  themselves in the "unprocessed" state.
+
+			Note that the same cell can appear multiple times in the DFS -
+			just never as an ancestor to itself, i.e. more than once in the
+			tracing of the route.
+
+			Note that this very much modifies the arrays passed to it.
+			(Yes it returns a boolean, but that is only to inform you
+			as to whether the entire DFS has completed.)
+
+
+
+		*/
 		boolean result = false;
 
 		for(int i = nodes.size() - 1; i >= 0; i--) {
@@ -265,5 +296,23 @@ public class Node {
 	} // extend method
 
 
+
+
+// Everything above has been for the purpose of implementing a depth-first
+// search. Let's now do things differently, where we have series of waves,
+// each one a little bit further out from the starting square.
+
+	public ArrayList<Node> propagate(ArrayList<Node> noGoZone, int maxCost, int turnCost) {
+		// starting wherever we are, enumerate every reachable node that
+		// satisfies both:
+		// A/ the FROM-START cost of reaching it doesn't exceed maxCost
+		// B/ it's not one of the no-go-zone nodes
+
+		ArrayList<Node> results = new ArrayList<Node>();
+
+
+
+		return results;
+	} // propagate method
 
 } // Node class
