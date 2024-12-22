@@ -26,7 +26,7 @@ public class Node {
 	public int getTurnCount() {return this.turnCount;}
 	public int getStepCount() {return this.stepCount;}
 
-	public int getScore() {return this.stepCount + 1000 * this.turnCount;}
+	public int getScore(int turnScore) {return this.stepCount + turnScore * this.turnCount;}
 
 	// setters
 	public void setProcessedState(boolean isProcessed) {this.isProcessed = isProcessed;}
@@ -202,7 +202,14 @@ public class Node {
 
 
 
-	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug) {
+	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug, int turnScore) {
+
+		ArrayList<Node> reachableSet = new ArrayList<Node>();
+		return extend(nodes, scores, debug, reachableSet, null, turnScore, null);
+
+	} // version without reachableSet or target score
+
+	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug, ArrayList<Node> reachableSet, Integer targetScore, int turnScore, ArrayList<Node> noGoZone) {
 		/*
 			Repeatedly applying this to a list of nodes will implement
 			depth-first-search (DFS).
@@ -216,6 +223,8 @@ public class Node {
 			- Also if it's the end-cell, then PRUNE THE BRANCH - i.e.,
 			  keep removing the nodes that led us to the end, UNTIL
 			  one is found that allows for a different path forwards.
+
+			- (The same applies if the target score is reached.)
 
 			- If it's a typical non-end-cell, we have this concept of "is
 			  it processed?". This just means "have we found its children
@@ -243,13 +252,22 @@ public class Node {
 			if(node.hasBeenProcessed()) {
 
 			} else {
-				if(node.isEndCell()) {
+
+				boolean endState = node.isEndCell();
+				int score = node.getScore(turnScore);
+
+				if(targetScore != null)	endState = endState || (score >= targetScore);
+
+
+				if(endState) {
+					reachableSet.add(node);
+					if(debug) System.out.println(node.getCoords() + " added to reachable set.");
+
 					if(debug) System.out.println(node.traceRoute());
 					if(debug) System.out.println(node.getTurnCount() + " turns needed.");
 
 					if(debug) System.out.println(node.getStepCount() + " steps needed.");
 
-					int score = node.getScore();
 					if(debug) System.out.println("Scoring " + score);
 					scores.add(score);
 
@@ -280,8 +298,14 @@ public class Node {
 					// processed state
 
 					// remember that it goes ON the list WITHOUT knowing its
-					// children...
-					ArrayList<Node> children = node.findChildren(debug);
+					// children (the unprocessed state)
+					ArrayList<Node> children;
+					if(noGoZone == null)
+						children = node.findChildren(debug);
+					else
+						children = node.findChildren(debug, noGoZone);
+
+
 					for(Node child : children) nodes.add(child);
 					node.setProcessedState(true);
 					result = true;
@@ -298,21 +322,5 @@ public class Node {
 
 
 
-// Everything above has been for the purpose of implementing a depth-first
-// search. Let's now do things differently, where we have series of waves,
-// each one a little bit further out from the starting square.
-
-	public ArrayList<Node> propagate(ArrayList<Node> noGoZone, int maxCost, int turnCost) {
-		// starting wherever we are, enumerate every reachable node that
-		// satisfies both:
-		// A/ the FROM-START cost of reaching it doesn't exceed maxCost
-		// B/ it's not one of the no-go-zone nodes
-
-		ArrayList<Node> results = new ArrayList<Node>();
-
-
-
-		return results;
-	} // propagate method
 
 } // Node class
