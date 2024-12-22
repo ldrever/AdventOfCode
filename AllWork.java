@@ -49,8 +49,10 @@ public class AllWork {
 
 		System.out.println("Verifying tests pass...");
 
-		for(int i = 0; i < ra.length; i++) {
+		for(int i = ra.length - 1; i >= 0; i--) {
 			int problem = i + 1;
+
+			boolean debug = (i + 1 == ra.length); // always apply debug to the last one in the list
 
 
 			String nextClassString = "Day" + String.format("%02d", problem);
@@ -65,7 +67,7 @@ public class AllWork {
 				int part = j + 1;
 				long rightAnswer = ra[i][j];
 				System.out.print("Day " + problem + " part " + part +" should be " + rightAnswer + "; it is in fact...");
-				boolean debug = false;
+
 				Method answerMethod = null;
 				try {
 					answerMethod = nextClass.getDeclaredMethod("answer", int.class, boolean.class);

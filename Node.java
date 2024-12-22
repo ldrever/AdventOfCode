@@ -98,6 +98,24 @@ public class Node {
 	} // didComeVia method
 
 
+
+
+	public ArrayList<Node> getAncestors() { // NB also includes the current node as an ancestor of itself
+
+		ArrayList<Node> results = new ArrayList<Node>();
+		Node node = this;
+
+		while(node != null) {
+			results.add(node);
+			node = node.getParent();
+		} // ancestor-iteration loop
+
+		return results;
+	} // getAncestors method
+
+
+
+
 	public Node spawnAt(int spawnRow, int spawnColumn, int arrivalDy, int arrivalDx) {
 
 		Node newNode = new Node(spawnRow, spawnColumn, this, this.parentGrid, arrivalDy, arrivalDx);
@@ -107,12 +125,20 @@ public class Node {
 	} // spawnAt method
 
 
-	public ArrayList<Node> findChildren(boolean debug) {
 
+	public ArrayList<Node> findChildren(boolean debug) { // default no-go-zone is its OWN ANCESTORS
+		ArrayList<Node> noGoZone = this.getAncestors();
+		return this.findChildren(debug, noGoZone);
+	}
+
+
+
+	public ArrayList<Node> findChildren(boolean debug, ArrayList<Node> noGoZone) {
 		ArrayList<Node> output = new ArrayList<Node>();
 
 		for(int dy = -1; dy <= 1; dy++) {
 
+			nextNeighbour:
 			for(int dx = -1; dx <= 1; dx++) {
 
 				if(Math.abs(dx) + Math.abs(dy) != 1) continue;
@@ -121,30 +147,34 @@ public class Node {
 				int nextColumn = this.column + dx;
 				if(debug) System.out.print("Investigating" + nextRow + "," + nextColumn + ")...");
 
+				// ignore the next neighbour if it's a wall:
 				if(parentGrid.getCell(nextRow, nextColumn) == '#') {
-					// ignore walls
-					//System.out.println("that's a wall.");
-
-				} else if(this.didComeVia(nextRow, nextColumn)) {
-					// ignore ancestor nodes
-					//System.out.println("already visited.");
-
-				} else {
-					if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
-					Node newNode = this.spawnAt(nextRow, nextColumn, dy, dx);
-
-					int turnsSoFar = this.getTurnCount();
-					boolean corner = (this.arrivalDy != dy || this.arrivalDx != dx);
-
-					newNode.setTurnCount(corner ? turnsSoFar + 1 : turnsSoFar);
-					newNode.setStepCount(this.getStepCount() + 1);
-
-
-
-
-					output.add(newNode);
+					if(debug) System.out.println("that's a wall.");
+					continue nextNeighbour;
 				}
 
+				// ignore the next neighbour if it's in the no-go-zone:
+				for(Node ancestor : noGoZone) {
+					if(ancestor != null) {
+						int ancRow = ancestor.getRow();
+						int ancColumn = ancestor.getColumn();
+
+						if(nextRow == ancRow && nextColumn == ancColumn) {
+							continue nextNeighbour;
+						}
+					}
+				}
+
+				// every other neighbouring cell is fair game:
+				if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
+				Node newNode = this.spawnAt(nextRow, nextColumn, dy, dx);
+
+				int turnsSoFar = this.getTurnCount();
+				boolean corner = (this.arrivalDy != dy || this.arrivalDx != dx);
+
+				newNode.setTurnCount(corner ? turnsSoFar + 1 : turnsSoFar);
+				newNode.setStepCount(this.getStepCount() + 1);
+				output.add(newNode);
 			}
 
 		}
@@ -156,11 +186,15 @@ public class Node {
 
 	} // findChildren method
 
+
+
 	public void removeChild(Node child) {
 
 		this.children.remove(child);
 
 	} // removeChild method
+
+
 
 	public boolean isChildless() {
 		return this.children.size() == 0;
