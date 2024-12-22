@@ -81,7 +81,7 @@ class Day13 {
 			} // line-based while loop
 
 			sc.close();
-			System.out.println("Success processing file");
+			//System.out.println("Success processing file");
 		} catch (Exception e) {
 			System.out.println("Error processing file");
 		}
@@ -90,26 +90,27 @@ class Day13 {
 
 
 
-	public static void main(String[] args) {
+		public static long answer(int part, boolean debug) throws Exception {
+//	public static void main(String[] args) {
 
 		ArrayList<ClawMachine> machines = new ArrayList<ClawMachine>();
-		boolean part2 = false;
-		processFile("Y:\\code\\java\\AdventOfCode\\Day13small.dat", machines, part2);
+		boolean part2 = (part == 2);
+		processFile("Y:\\code\\java\\AdventOfCode\\Day13input.dat", machines, part2); // FIXME reinstate "small" input and solve part 3
 
 		long total = 0;
 		long currentlyAt = 1;
 		long size = machines.size();
 
 		for(ClawMachine m : machines) {
-			System.out.println();
-			System.out.println("PROCESSING MACHINE " + currentlyAt + " OF " + size);
-			System.out.println(m.toString());
+		//	System.out.println();
+		//	System.out.println("PROCESSING MACHINE " + currentlyAt + " OF " + size);
+		//	System.out.println(m.toString());
 			total += m.solve();
 
 		}
 
-		System.out.println("Total: " + total);
-
+		//System.out.println("Total: " + total);
+		return total;
 
 
 	} // main method

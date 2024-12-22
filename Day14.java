@@ -39,7 +39,7 @@ class Day14 {
 			} // file-read while loop
 
 			sc.close();
-			System.out.println("Success processing file");
+			//System.out.println("Success processing file");
 
 		} catch (Exception e) {
 			System.out.println("Error processing file");
@@ -188,9 +188,37 @@ class Day14 {
 
 
 
-	public static void main(String[] args) {
+	public static LetterGrid getGrid(ArrayList<Integer> x, ArrayList<Integer> y, int height, int width) {
 
-		boolean part1 = true;
+		boolean[][] results = new boolean[height][width];
+
+		for(int index = 0; index < x.size(); index++)
+			results[y.get(index)][x.get(index)] = true;
+/*
+		System.out.println("NOW SHOWING RESULTS FOR TIME: " + time );
+		System.out.println("====================================================");
+
+		for(int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++)
+				System.out.print(results[i][j] ? "X" : " ");
+
+			System.out.println();
+		}
+
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Continue?");
+		String input = sc.next();
+*/
+		return new LetterGrid(results, 'X', ' ');
+	} // displayArray method
+
+
+
+
+		public static long answer(int part, boolean debug) throws Exception {
+//	public static void main(String[] args) {
+
+		boolean part1 = (part == 1);
 		int width = 101;
 		int height = 103;
 
@@ -204,7 +232,8 @@ class Day14 {
 		if(part1) {
 			evolve(height, width, 100, velocityX, velocityY, positionX, positionY);
 			int[][] segregation = divisions (height, width, height / 2, width / 2, positionX, positionY);
-			System.out.println("Part 1 answer: " + latticeProduct(segregation));
+			//System.out.println("Part 1 answer: " + latticeProduct(segregation));
+			return latticeProduct(segregation);
 		} else {
 
 			// every robot's x-periodicity has to be a fraction of width; likewise y and height
@@ -215,14 +244,21 @@ class Day14 {
 
 				// let's hope that the xmas tree pic will entail blank space in other areas -
 				// checking for a 6x6 lattice with at least one of its blocks empty:
-				int[][] segregation = divisions (height, width, height / 6, width / 6, positionX, positionY);
-				if(0 == latticeProduct(segregation)) displayArray(positionX, positionY, height, width, time);
 
+				// crude but cheap filter saying that we want a significant empty area
+				int[][] segregation = divisions (height, width, height / 6, width / 6, positionX, positionY);
+				if(0 == latticeProduct(segregation)) { //displayArray(positionX, positionY, height, width, time); // manual approach
+
+					// fine but costly filter saying we want several connected regions each with a significant number of blocks
+					LetterGrid lg = getGrid(positionX, positionY, height, width);
+					if(lg.hasBigAreas(20, 4)) return time;
+				}
 				evolve(height, width, 1, velocityX, velocityY, positionX, positionY);
 			} // single time-step loop
 
 		} // part1 / part2 if
 
-	} // main method
+		return -1;
+	} // answer method
 
 } // Day13 class

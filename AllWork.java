@@ -27,11 +27,11 @@ public class AllWork {
 					,{          510L,           1058L}
 					,{       233050L,276661131175807L}
 					,{      1437300L,         849332L}
-		/*			,{29598L,93217456941970L}
-					,{,}
-					,{,}
-					,{,}
-					,{,}
+					,{        29598L, 93217456941970L} // FIXME want to do "part 3" of day 13 also
+					,{    228690000L,           7093L}
+					,{      1495147L,        1524905L}
+					,{11048L,11048L} // FIXME day 16: this is actually one of the baby sample maps; checking my DFS implementation doesn't break
+		/*			,{,}
 					,{,}
 					,{,}
 					,{,}

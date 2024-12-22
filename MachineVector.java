@@ -35,8 +35,9 @@ public class MachineVector {
 
 	public static MachineVector solve(MachineVector a, MachineVector b, MachineVector z) throws Exception {
 		long determinant = a.getDeterminant(b);
-		degenerateSolve(a, b, z);
-		if(determinant == 0L) return degenerateSolve(a, b, z);
+		// FIXME
+		//degenerateSolve(a, b, z);
+		//if(determinant == 0L) return degenerateSolve(a, b, z);
 
 		// invert 2D matrix
 		long solutionX = b.getY() * z.getX() - b.getX() * z.getY();

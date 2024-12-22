@@ -34,17 +34,17 @@ public class ClawMachine {
 		MachineVector b = new MachineVector(bx, by);
 		MachineVector z = new MachineVector(prizex, prizey);
 
-		System.out.println("Working on ( " + a.toString() + " " + b.toString() + ")(x,y) = " + z.toString());
+		//System.out.println("Working on ( " + a.toString() + " " + b.toString() + ")(x,y) = " + z.toString());
 
 		try {
 			MachineVector solution = MachineVector.solve(a, b, z);
-			System.out.println(solution.toString() + " resolves this one.");
+		//	System.out.println(solution.toString() + " resolves this one.");
 			long value = solution.dotProduct(new MachineVector(3L, 1L));
-			System.out.println("costing " + value);
+		//	System.out.println("costing " + value);
 			return value;
 
 		} catch (Exception e) {
-			System.out.println("Cannot currently handle this situation. (" + e.getMessage() + ")");
+		//	System.out.println("Cannot currently handle this situation. (" + e.getMessage() + ")");
 			return 0L;
 		}
 

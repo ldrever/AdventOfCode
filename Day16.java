@@ -14,16 +14,16 @@ class Day16 {
 
 			} else {
 				if(node.isEndCell()) {
-					System.out.println(node.traceRoute());
-					System.out.println(node.getTurnCount() + " turns needed.");
+					if(debug) System.out.println(node.traceRoute());
+					if(debug) System.out.println(node.getTurnCount() + " turns needed.");
 
-					System.out.println(node.getStepCount() + " steps needed.");
+					if(debug) System.out.println(node.getStepCount() + " steps needed.");
 
 					int score = node.getScore();
-					System.out.println("Scoring " + score);
+					if(debug) System.out.println("Scoring " + score);
 					scores.add(score);
 
-					System.out.println();
+					if(debug) System.out.println();
 
 					Node currentNode = node;
 					while(currentNode.isChildless()) {
@@ -66,12 +66,13 @@ class Day16 {
 	} // processLatest method
 
 
-	public static void main(String[] args) {
+		public static long answer(int part, boolean debug) throws Exception {
+//	public static void main(String[] args) {
 
-		boolean debug = false;
+//		boolean debug = false;
 		boolean isPart1 = true;
 
-		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16input.dat"; // FIXME second needs small -> input
+		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16small.dat"; // FIXME second needs small -> input
 		LetterGrid lg = null;
 
 		try {
@@ -80,8 +81,8 @@ class Day16 {
 		catch (Exception e) {System.out.println("file processing error");}
 
 
-		lg.findStart(true);
-		lg.findEnd(true);
+		lg.findStart(debug);
+		lg.findEnd(debug);
 
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Integer> scores = new ArrayList<Integer>();
@@ -107,8 +108,8 @@ class Day16 {
 			}
 		}
 
-		System.out.println("BEST POSSIBLE SCORE HERE: " + bestScore);
-
+		//System.out.println("BEST POSSIBLE SCORE HERE: " + bestScore);
+		return bestScore;
 
 
 		/*

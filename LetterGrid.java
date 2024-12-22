@@ -110,7 +110,25 @@ public class LetterGrid {
 	}
 
 
+	public boolean hasBigAreas(int desiredSize, int desiredCount) {
+
+		ArrayList<Area> areas = new ArrayList<Area>();
+		this.floodFill(false, areas, 0, 0);
+		int actualCount = 0;
+		for (Area area : areas) {
+			if(area.getBlocks() >= desiredSize) {
+				actualCount++;
+
+			}
+
+		}
+		return (actualCount >= desiredCount);
+
+	} // hasBigAreas method
+
 	public synchronized void floodFill(boolean debug, ArrayList<Area> areaList, int beginRow, int beginCol) {
+// WHAT DOES IT ACTUALLY *DO* TO THE LETTERGRID THOUGH??
+
 
 /*
 	Start with a seed cell, and iteratively apply the principle that
