@@ -3,69 +3,6 @@ import java.io.*;
 
 class Day16 {
 
-	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug) {
-		boolean result = false;
-
-		for(int i = nodes.size() - 1; i >= 0; i--) {
-
-			Node node = nodes.get(i);
-
-			if(node.hasBeenProcessed()) {
-
-			} else {
-				if(node.isEndCell()) {
-					if(debug) System.out.println(node.traceRoute());
-					if(debug) System.out.println(node.getTurnCount() + " turns needed.");
-
-					if(debug) System.out.println(node.getStepCount() + " steps needed.");
-
-					int score = node.getScore();
-					if(debug) System.out.println("Scoring " + score);
-					scores.add(score);
-
-					if(debug) System.out.println();
-
-					Node currentNode = node;
-					while(currentNode.isChildless()) {
-						if(debug) System.out.print(currentNode.getCoords() + " is childless...");
-						nodes.remove(currentNode);
-						if(debug) System.out.print("successfully removed...");
-						Node parent = currentNode.getParent();
-						parent.removeChild(currentNode);
-						if(debug) System.out.println("along with the parent's link to it.");
-						currentNode = parent;
-
-					} // isChildless while-loop
-
-					// now at a state where the current node ISN'T childless,
-					// in spite of having had a child removed.
-
-
-				}
-
-				//} else {
-					if(debug) System.out.println("Found that node " + node.getCoords() + " has not been processed. Attempting to process it now...");
-					// now that we've found the newest unprocessed, here's what
-					// we do - just add its children to the list, and update its
-					// processed state
-
-					// remember that it goes ON the list WITHOUT knowing its
-					// children...
-					ArrayList<Node> children = node.findChildren(debug);
-					for(Node child : children) nodes.add(child);
-					node.setProcessedState(true);
-					result = true;
-					break;
-				//}
-			}
-
-
-		} // i for-loop
-		return result;
-
-	} // processLatest method
-
-
 		public static long answer(int part, boolean debug) throws Exception {
 //	public static void main(String[] args) {
 
@@ -96,7 +33,7 @@ class Day16 {
 
 		while(safetyCounter < 10_000_000) {
 			safetyCounter++;
-			boolean result = extend(nodes, scores, debug);
+			boolean result = Node.extend(nodes, scores, debug);
 			if(!result) break;
 		}
 
