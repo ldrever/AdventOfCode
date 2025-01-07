@@ -4,35 +4,25 @@ import java.io.*;
 class Day16 {
 
 	public static void main(String[] args) {
-
 		ArrayList<Node> previousBoundary = new ArrayList<Node>();
-
 		boolean debug = true;
-
 		boolean isPart1 = true;
 		int turnScore = 1000;
-
 		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16small.dat"; // FIXME second needs small -> input
 		LetterGrid lg = null;
-
 		try {
 			lg = new LetterGrid(filePath);
 		}
 		catch (Exception e) {System.out.println("file processing error");}
-
-
 		lg.findStart(debug);
 		lg.findEnd(debug);
-
-
-
 		int arrivalDy = 0;
 		int arrivalDx = 1; // start facing East
-		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), null, lg, arrivalDy, arrivalDx);
+		Node parent = null;
+		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), parent, lg, arrivalDy, arrivalDx);
 		previousBoundary.add(origin);
-
 		int safetyCounter = 0;
-		int targetScore = 5;
+		int targetScore = 5; // FIXME - WHY?
 
 		while(safetyCounter < 1) {
 			safetyCounter++;

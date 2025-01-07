@@ -15,7 +15,6 @@ public class Node {
 	private int turnCount;
 	private int stepCount;
 
-
 	// getters
 	public int getRow() {return this.row;}
 	public int getColumn() {return this.column;}
@@ -145,7 +144,7 @@ public class Node {
 
 				int nextRow = this.row + dy;
 				int nextColumn = this.column + dx;
-				if(debug) System.out.print("Investigating" + nextRow + "," + nextColumn + ")...");
+				if(debug) System.out.print("Investigating (" + nextRow + "," + nextColumn + ")...");
 
 				// ignore the next neighbour if it's a wall:
 				if(parentGrid.getCell(nextRow, nextColumn) == '#') {
