@@ -54,6 +54,9 @@ class Day16 {
 					*/
 
 					// but isn't the whole IDEA of the extend() method that it never revisits a square??
+
+					// OK - sure we pass in the noGoZone; but we STILL should be excluding the history-list,
+					// from the nodes that can form valid new children, right?
 					boolean outcome = Node.extend(scratchpad, scores, debug, reachableSet, targetScore, turnScore, previousBoundary);
 					if(!outcome) break;
 				} // loop to keep pushing outwards from one cell
