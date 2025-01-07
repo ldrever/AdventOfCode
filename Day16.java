@@ -39,6 +39,21 @@ class Day16 {
 				int innerCounter = 0;
 				while(innerCounter < 25) {
 					innerCounter++;
+
+					// LD FIXME - main problem with this is it can backtrack, per debug output below:
+					/*
+
+						Investigating (14,1)...About to spawn at (14,1)
+						Newly discovered children are:(12,1)(14,1)
+						(14,1) added to reachable set.
+						(15,1)(14,1)(13,1)(14,1)
+						2 turns needed.
+						3 steps needed.
+						Scoring 2003
+
+					*/
+
+					// but isn't the whole IDEA of the extend() method that it never revisits a square??
 					boolean outcome = Node.extend(scratchpad, scores, debug, reachableSet, targetScore, turnScore, previousBoundary);
 					if(!outcome) break;
 				} // loop to keep pushing outwards from one cell

@@ -208,7 +208,15 @@ public class Node {
 
 	} // version without reachableSet or target score
 
-	public static boolean extend(ArrayList<Node> nodes, ArrayList<Integer> scores, boolean debug, ArrayList<Node> reachableSet, Integer targetScore, int turnScore, ArrayList<Node> noGoZone) {
+	public static boolean extend(
+		  ArrayList<Node> nodes
+		, ArrayList<Integer> scores
+		, boolean debug
+		, ArrayList<Node> reachableSet
+		, Integer targetScore
+		, int turnScore
+		, ArrayList<Node> noGoZone
+		) {
 		/*
 			Repeatedly applying this to a list of nodes will implement
 			depth-first-search (DFS).
@@ -261,7 +269,7 @@ public class Node {
 				if(endState) {
 					reachableSet.add(node);
 					if(debug) System.out.println(node.getCoords() + " added to reachable set.");
-
+					if(debug) System.out.print("Tracing... ");
 					if(debug) System.out.println(node.traceRoute());
 					if(debug) System.out.println(node.getTurnCount() + " turns needed.");
 
