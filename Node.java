@@ -24,6 +24,9 @@ public class Node {
 	public boolean hasBeenProcessed() {return this.isProcessed;}
 	public int getTurnCount() {return this.turnCount;}
 	public int getStepCount() {return this.stepCount;}
+	public int getArrivalDy() {return this.arrivalDy;}
+	public int getArrivalDx() {return this.arrivalDx;}
+
 
 	public int getScore(int turnScore) {return this.stepCount + turnScore * this.turnCount;}
 
@@ -215,6 +218,129 @@ public class Node {
 		return extend(nodes, scores, debug, reachableSet, null, turnScore, null);
 
 	} // version without reachableSet or target score
+
+
+
+	public static ArrayList<Node> findNextBoundary(
+		/*
+			Starting with one boundary, find the next boundary out,
+			defined as the first nodes reachable FROM that boundary
+			that reach a given threshold score.
+
+		*/
+		  ArrayList<Node> currentBoundary
+		, ArrayList<Node> oldInterior
+		, boolean debug
+		, int threshold
+		, int turnCost
+		) {
+
+		ArrayList<Node> output = new ArrayList<>();
+		ArrayList<Node> future = new ArrayList<>();
+
+		// effectively makes this "pass-by-value":
+		ArrayList<Node> present = new ArrayList<>();
+		ArrayList<Node> history = new ArrayList<>();
+		for(Node n : currentBoundary) present.add(n);
+		for(Node n : oldInterior) history.add(n);
+
+
+
+		while(present.size() > 0) {
+
+			// suits us to include present in history -
+			// must be done in an earlier pass though:
+			for(Node n : present) history.add(n);
+
+			for(Node n : present) {
+
+				ArrayList<Node> children = n.findChildren(debug, history);
+
+				childLoop:
+				for(int c = 0; c < children.size(); c++) {
+
+					futureLoop:
+					for(int f = 0; f < future.size(); f++) {
+
+						Node n1 = children.get(c);
+						Node n2 = future.get(f);
+
+						if(
+						   n1.getRow() 			== n2.getRow()
+						&& n1.getColumn() 		== n2.getColumn()
+						&& n1.getArrivalDy() 	== n2.getArrivalDy()
+						&& n1.getArrivalDx() 	== n2.getArrivalDx()
+						) {
+
+							// keep only the cheapest
+							// FIXME - not enough to do this layer by layer!
+							if(n1.getScore(turnCost) > n2.getScore(turnCost) ) {
+								children.remove(c);
+								c--;
+								continue childLoop;
+
+							} else {
+								future.remove(f);
+								f--;
+								continue futureLoop;
+
+							}
+
+						} // double-arrival if()
+
+					} // futureLoop
+
+				} // childLoop
+
+				for(Node child : children) future.add(child);
+
+
+			} // loop over present
+			// FIXME - so would it be here, and the fresh set of future nodes,
+			// that we have to compare against the output? pulling out ones
+			// also found as future points?
+
+
+			/*
+				OK - so at this point, every node that is reachable from present
+				is in either history, present or future.
+
+				future is basically "one layer more".
+
+				Let's now work through future, and do one of two things:
+				- if its score reaches the threshold, then it's an answer!
+				- FIXME - ONLY TENTATIVELY! A ROUNDABOUT ROUTE COULD SCORE LESS!!!
+				- otherwise, it becomes part of the present for the next
+				  iteration
+
+			*/
+
+			// update
+			present.clear();
+
+			for(Node kid : future) {
+
+				if(kid.getScore(turnCost) >= threshold) {
+					output.add(kid);
+
+				} else {
+					present.add(kid);
+
+				}
+
+			}
+
+			future.clear();
+
+		} // LOOP ENDS HERE
+
+		return output;
+
+	}
+
+
+
+
 
 	public static boolean extend(
 		  ArrayList<Node> nodes
