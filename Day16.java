@@ -22,7 +22,7 @@ class Day16 {
 		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), parent, lg, arrivalDy, arrivalDx);
 		previousBoundary.add(origin);
 		int safetyCounter = 0;
-		int targetScore = 5; // FIXME - WHY?
+		int targetScore = 0; // FIXME - WHY?
 
 		while(safetyCounter < 1) {
 			safetyCounter++;
@@ -37,26 +37,11 @@ class Day16 {
 				ArrayList<Node> reachableSet = new ArrayList<Node>();
 
 				int innerCounter = 0;
-				while(innerCounter < 25) {
+				while(innerCounter < 40) {
 					innerCounter++;
 
-					// LD FIXME - main problem with this is it can backtrack, per debug output below:
-					/*
+					// LD FIXME - problem now is that it's returning paths scoring 4k plus, even when given a target of 1k
 
-						Investigating (14,1)...About to spawn at (14,1)
-						Newly discovered children are:(12,1)(14,1)
-						(14,1) added to reachable set.
-						(15,1)(14,1)(13,1)(14,1)
-						2 turns needed.
-						3 steps needed.
-						Scoring 2003
-
-					*/
-
-					// but isn't the whole IDEA of the extend() method that it never revisits a square??
-
-					// OK - sure we pass in the noGoZone; but we STILL should be excluding the history-list,
-					// from the nodes that can form valid new children, right?
 					boolean outcome = Node.extend(scratchpad, scores, debug, reachableSet, targetScore, turnScore, previousBoundary);
 					if(!outcome) break;
 				} // loop to keep pushing outwards from one cell

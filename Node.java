@@ -125,13 +125,6 @@ public class Node {
 
 
 
-	public ArrayList<Node> findChildren(boolean debug) { // default no-go-zone is its OWN ANCESTORS
-		ArrayList<Node> noGoZone = this.getAncestors();
-		return this.findChildren(debug, noGoZone);
-	}
-
-
-
 	public ArrayList<Node> findChildren(boolean debug, ArrayList<Node> noGoZone) {
 		ArrayList<Node> output = new ArrayList<Node>();
 
@@ -152,18 +145,33 @@ public class Node {
 					continue nextNeighbour;
 				}
 
-				// ignore the next neighbour if it's in the no-go-zone:
-				for(Node ancestor : noGoZone) {
+				// ignore the next neighbour if it's in the history:
+				for(Node ancestor : this.getAncestors()) {
 					if(ancestor != null) {
 						int ancRow = ancestor.getRow();
 						int ancColumn = ancestor.getColumn();
 
 						if(nextRow == ancRow && nextColumn == ancColumn) {
+							if(debug) System.out.println("been there.");
 							continue nextNeighbour;
 						}
 					}
 				}
 
+				// ignore the next neighbour if it's in the no-go-zone:
+				if(noGoZone != null) {
+					for(Node ancestor : noGoZone) {
+						if(ancestor != null) {
+							int ancRow = ancestor.getRow();
+							int ancColumn = ancestor.getColumn();
+
+							if(nextRow == ancRow && nextColumn == ancColumn) {
+								if(debug) System.out.println("haram");
+								continue nextNeighbour;
+							}
+						}
+					}
+				}
 				// every other neighbouring cell is fair game:
 				if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
 				Node newNode = this.spawnAt(nextRow, nextColumn, dy, dx);
@@ -286,9 +294,17 @@ public class Node {
 						nodes.remove(currentNode);
 						if(debug) System.out.print("successfully removed...");
 						Node parent = currentNode.getParent();
-						parent.removeChild(currentNode);
-						if(debug) System.out.println("along with the parent's link to it.");
-						currentNode = parent;
+
+						if(parent == null) { // fixme not sure how this is possible still
+							System.out.println(currentNode.getCoords() + " is PARENTless...");
+							break;
+						} else {
+
+							parent.removeChild(currentNode);
+							if(debug) System.out.println("along with the parent's link to it.");
+							currentNode = parent;
+						}
+
 
 					} // isChildless while-loop
 
@@ -307,9 +323,12 @@ public class Node {
 					// remember that it goes ON the list WITHOUT knowing its
 					// children (the unprocessed state)
 					ArrayList<Node> children;
+
+					/*
 					if(noGoZone == null)
 						children = node.findChildren(debug);
 					else
+					*/
 						children = node.findChildren(debug, noGoZone);
 
 
