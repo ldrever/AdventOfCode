@@ -14,6 +14,7 @@ public class Node {
 	private int arrivalDx;
 	private int turnCount;
 	private int stepCount;
+	private boolean isFertile;
 
 	// getters
 	public int getRow() {return this.row;}
@@ -26,6 +27,7 @@ public class Node {
 	public int getStepCount() {return this.stepCount;}
 	public int getArrivalDy() {return this.arrivalDy;}
 	public int getArrivalDx() {return this.arrivalDx;}
+	public boolean getFertility() {return this.isFertile;}
 
 
 	public int getScore(int turnScore) {return this.stepCount + turnScore * this.turnCount;}
@@ -34,6 +36,7 @@ public class Node {
 	public void setProcessedState(boolean isProcessed) {this.isProcessed = isProcessed;}
 	public void setTurnCount(int turnCount) {this.turnCount = turnCount;}
 	public void setStepCount(int stepCount) {this.stepCount = stepCount;}
+	public void setFertility(boolean fertility) {this.isFertile = fertility;}
 
 	// constructor
 	public Node(int row, int column, Node parent, LetterGrid parentGrid, int arrivalDy, int arrivalDx) {
@@ -47,6 +50,7 @@ public class Node {
 
 		this.parentGrid = parentGrid;
 		this.isProcessed = false;
+		this.isFertile = true;
 		this.arrivalDy = arrivalDy;
 		this.arrivalDx = arrivalDx;
 
@@ -127,8 +131,22 @@ public class Node {
 	} // spawnAt method
 
 
+	public boolean isCheaperThan(Node other, int turnScore) {
+		int thisScore = this.getScore(turnScore);
+		int otherScore = other.getScore(turnScore);
+
+		return (thisScore < otherScore);
+	}
+
+
 
 	public ArrayList<Node> findChildren(boolean debug, ArrayList<Node> noGoZone) {
+		return findChildren(debug, noGoZone, false);
+
+	}
+
+
+	public ArrayList<Node> findChildren(boolean debug, ArrayList<Node> noGoZone, boolean allowAncestorsAsChildren) {
 		ArrayList<Node> output = new ArrayList<Node>();
 
 		for(int dy = -1; dy <= 1; dy++) {
@@ -140,28 +158,35 @@ public class Node {
 
 				int nextRow = this.row + dy;
 				int nextColumn = this.column + dx;
-				if(debug) System.out.print("Investigating (" + nextRow + "," + nextColumn + ")...");
+				//if(debug) System.out.print("Investigating (" + nextRow + "," + nextColumn + ")...");
 
 				// ignore the next neighbour if it's a wall:
 				if(parentGrid.getCell(nextRow, nextColumn) == '#') {
-					if(debug) System.out.println("that's a wall.");
+					// if(debug) System.out.println("that's a wall.");
 					continue nextNeighbour;
 				}
 
 				// ignore the next neighbour if it's in the history:
-				for(Node ancestor : this.getAncestors()) {
-					if(ancestor != null) {
-						int ancRow = ancestor.getRow();
-						int ancColumn = ancestor.getColumn();
+				// IGNOREMENT WILL HAPPEN BASED ONLY ON POSITION, NOT
+				// ON DIRECTION - I.E. IT IS MAXIMALLY STRICT!
 
-						if(nextRow == ancRow && nextColumn == ancColumn) {
-							if(debug) System.out.println("been there.");
-							continue nextNeighbour;
+				if(!allowAncestorsAsChildren) {
+					for(Node ancestor : this.getAncestors()) {
+						if(ancestor != null) {
+							int ancRow = ancestor.getRow();
+							int ancColumn = ancestor.getColumn();
+
+							if(nextRow == ancRow && nextColumn == ancColumn) {
+								//if(debug) System.out.println("been there.");
+								continue nextNeighbour;
+							}
 						}
 					}
-				}
 
+				}
 				// ignore the next neighbour if it's in the no-go-zone:
+				// IGNOREMENT WILL HAPPEN BASED ONLY ON POSITION, NOT
+				// ON DIRECTION - I.E. IT IS MAXIMALLY STRICT!
 				if(noGoZone != null) {
 					for(Node ancestor : noGoZone) {
 						if(ancestor != null) {
@@ -169,14 +194,14 @@ public class Node {
 							int ancColumn = ancestor.getColumn();
 
 							if(nextRow == ancRow && nextColumn == ancColumn) {
-								if(debug) System.out.println("haram");
+								//if(debug) System.out.println("haram");
 								continue nextNeighbour;
 							}
 						}
 					}
 				}
 				// every other neighbouring cell is fair game:
-				if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
+				//if(debug) System.out.println("About to spawn at (" + nextRow + "," + nextColumn + ")");
 				Node newNode = this.spawnAt(nextRow, nextColumn, dy, dx);
 
 				int turnsSoFar = this.getTurnCount();
@@ -185,12 +210,13 @@ public class Node {
 				newNode.setTurnCount(corner ? turnsSoFar + 1 : turnsSoFar);
 				newNode.setStepCount(this.getStepCount() + 1);
 				output.add(newNode);
+				// if(debug) System.out.println("New node at " + newNode.getCoords() + " scores " + newNode.getScore(1000)); // FIXME horrid hardcode
 			}
 
 		}
-		if(debug) System.out.print("Newly discovered children are:");
-		if(debug) for(Node child : output) System.out.print(child.getCoords());
-		if(debug) System.out.println();
+		//if(debug) System.out.print("Newly discovered children are:");
+		//if(debug) for(Node child : output) System.out.print(child.getCoords());
+		//if(debug) System.out.println();
 
 		return output;
 

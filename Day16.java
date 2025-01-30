@@ -4,7 +4,7 @@ import java.io.*;
 class Day16 {
 
 	public static void main(String[] args) {
-		ArrayList<Node> previousBoundary = new ArrayList<Node>();
+		//ArrayList<Node> previousBoundary = new ArrayList<Node>();
 		boolean debug = true;
 		boolean isPart1 = true;
 		int turnScore = 1000;
@@ -20,43 +20,18 @@ class Day16 {
 		int arrivalDx = 1; // start facing East
 		Node parent = null;
 		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), parent, lg, arrivalDy, arrivalDx);
-		previousBoundary.add(origin);
-		int safetyCounter = 0;
-		int targetScore = 0; // FIXME - WHY?
+		System.out.println("origin scores " + origin.getScore(turnScore));
 
-		while(safetyCounter < 1) {
-			safetyCounter++;
-			targetScore += turnScore;
+		Boundary currentBoundary = new Boundary(debug, origin, turnScore);
+		System.out.println(currentBoundary.toString());
 
-			for(Node node : previousBoundary) {
+		for(int i = 1; i < 8; i++) {
 
-				System.out.println("Next node in boundary is " + node.getCoords());
-				ArrayList<Node> scratchpad = new ArrayList<Node>();
-				scratchpad.add(node);
-				ArrayList<Integer> scores = new ArrayList<Integer>();
-				ArrayList<Node> reachableSet = new ArrayList<Node>();
-
-				int innerCounter = 0;
-				while(innerCounter < 40) {
-					innerCounter++;
-
-					// LD FIXME - problem now is that it's returning paths scoring 4k plus, even when given a target of 1k
-
-					boolean outcome = Node.extend(scratchpad, scores, debug, reachableSet, targetScore, turnScore, previousBoundary);
-					if(!outcome) break;
-				} // loop to keep pushing outwards from one cell
-
-				System.out.println("Targetting score " + targetScore + " from here, the reachable set is: ");
-
-				for(Node n : reachableSet) System.out.print(n.getCoords());
-				System.out.println();
-
-
-			} // loop over all cells in the boundary
+			currentBoundary = currentBoundary.getNextBoundary(debug, turnScore, 500 + i * turnScore);
+			System.out.println(currentBoundary.toString());
 
 
 		}
-
 
 
 	} // main method // FIXME - shouldn't exist!
