@@ -77,9 +77,8 @@ public class Boundary {
 
 	public Boundary getNextBoundary(boolean debug, int turnScore, int nextThreshold) {
 
-		// FIXME these should really be cloned...
-		NodeCollection latestLayer = this.outside;
-		NodeCollection history = this.inside;
+		NodeCollection latestLayer = this.outside.clone();
+		NodeCollection history = this.inside.clone();
 
 		do {
 			// now in the standard state whereby:
@@ -119,13 +118,19 @@ public class Boundary {
 		// here we check whether we've hit the end cell - note that
 		// we can't do this any sooner, since it's possible that a
 		// later "layer" will reach it more cheaply than an earlier one
+
+		int endScore = Integer.MAX_VALUE;
+
 		for(Node n : history.getNodes()) {
 			if(n.isEndCell()) {
-				int endScore = n.getScore(turnScore);
-				return new Boundary(endScore);
+
+				int newEndScore = n.getScore(turnScore);
+				if(newEndScore < endScore) endScore = newEndScore;
 
 			}
 		}
+
+		if(endScore < Integer.MAX_VALUE) return new Boundary(endScore);
 
 		// can now end via return all childless ones...
 		NodeCollection newOutside = history.getFinalOnes();

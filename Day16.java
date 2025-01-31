@@ -5,7 +5,7 @@ class Day16 {
 
 	public static void main(String[] args) {
 		//ArrayList<Node> previousBoundary = new ArrayList<Node>();
-		boolean debug = true;
+		boolean debug = false;
 		boolean isPart1 = true;
 		int turnScore = 1000;
 		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16input.dat";

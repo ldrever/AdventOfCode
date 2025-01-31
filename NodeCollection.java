@@ -35,6 +35,15 @@ public class NodeCollection {
 
 
 
+	public NodeCollection clone() {
+
+		ArrayList<Node> nodes = this.getNodes();
+		return new NodeCollection(nodes);
+
+	}
+
+
+
 	public NodeCollection getFinalOnes() {
 
 		ArrayList<Node> allNodes = this.nodes;
