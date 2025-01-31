@@ -17,7 +17,9 @@ public class Boundary {
 	private NodeCollection inside;
 	private NodeCollection outside;
 	private int threshold;
+	private boolean isEndCell;
 
+	public int getThreshold() {return this.threshold;}
 
 
 	/*
@@ -38,7 +40,7 @@ public class Boundary {
 		this.outside = new NodeCollection(outsideHolder);
 
 		this.threshold = origin.getScore(turnScore) + 1;
-
+		this.isEndCell = false;
 	}
 
 
@@ -47,7 +49,29 @@ public class Boundary {
 		this.inside = inside;
 		this.outside = outside;
 		this.threshold = threshold;
+		this.isEndCell = false;
 	}
+
+
+
+	// special constructor for the end-state
+	private Boundary(int threshold) {
+		this.inside = null;
+		this.outside = null;
+		this.threshold = threshold;
+		this.isEndCell = true;
+
+	}
+
+
+
+	public boolean isEndCell() {
+
+		return this.isEndCell;
+
+	}
+
+
 
 
 
@@ -64,6 +88,8 @@ public class Boundary {
 
 			// so we find the new layer...
 			NodeCollection newLayer = latestLayer.getGoodNeighbours(debug, turnScore, nextThreshold, history, false);
+
+
 
 
 			// winnow it down...
@@ -89,6 +115,17 @@ public class Boundary {
 			// starts off as a single point, and then relies on this to keep it ok
 
 		} while (latestLayer.hasNodes());
+
+		// here we check whether we've hit the end cell - note that
+		// we can't do this any sooner, since it's possible that a
+		// later "layer" will reach it more cheaply than an earlier one
+		for(Node n : history.getNodes()) {
+			if(n.isEndCell()) {
+				int endScore = n.getScore(turnScore);
+				return new Boundary(endScore);
+
+			}
+		}
 
 		// can now end via return all childless ones...
 		NodeCollection newOutside = history.getFinalOnes();

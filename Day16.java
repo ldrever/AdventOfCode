@@ -5,10 +5,10 @@ class Day16 {
 
 	public static void main(String[] args) {
 		//ArrayList<Node> previousBoundary = new ArrayList<Node>();
-		boolean debug = true;
+		boolean debug = false;
 		boolean isPart1 = true;
 		int turnScore = 1000;
-		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16small.dat"; // FIXME second needs small -> input
+		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16input.dat";
 		LetterGrid lg = null;
 		try {
 			lg = new LetterGrid(filePath);
@@ -25,13 +25,21 @@ class Day16 {
 		Boundary currentBoundary = new Boundary(debug, origin, turnScore);
 		System.out.println(currentBoundary.toString());
 
-		for(int i = 1; i < 8; i++) {
+		int turnCount = 0;
+		//for(int i = 1; i < 8; i++) {
+		do {
+			turnCount++;
 
-			currentBoundary = currentBoundary.getNextBoundary(debug, turnScore, 500 + i * turnScore);
-			System.out.println(currentBoundary.toString());
+			currentBoundary = currentBoundary.getNextBoundary(debug, turnScore, (turnScore / 2) + turnCount * turnScore);
 
+			if (currentBoundary.isEndCell()) {
+				System.out.println("detected final score of " + currentBoundary.getThreshold());
+				break;
+			} else {
+				System.out.println(currentBoundary.toString());
+			}
 
-		}
+		} while(turnCount < 1_000_000);
 
 
 	} // main method // FIXME - shouldn't exist!
