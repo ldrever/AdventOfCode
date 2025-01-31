@@ -5,7 +5,7 @@ class Day16 {
 
 	public static void main(String[] args) {
 		//ArrayList<Node> previousBoundary = new ArrayList<Node>();
-		boolean debug = false;
+		boolean debug = true;
 		boolean isPart1 = true;
 		int turnScore = 1000;
 		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16input.dat";
@@ -26,11 +26,12 @@ class Day16 {
 		System.out.println(currentBoundary.toString());
 
 		int turnCount = 0;
-		//for(int i = 1; i < 8; i++) {
+
 		do {
 			turnCount++;
+			int nextThreshold = (turnScore / 2) + turnCount * turnScore;
 
-			currentBoundary = currentBoundary.getNextBoundary(debug, turnScore, (turnScore / 2) + turnCount * turnScore);
+			currentBoundary = currentBoundary.getNextBoundary(debug, turnScore, nextThreshold);
 
 			if (currentBoundary.isEndCell()) {
 				System.out.println("detected final score of " + currentBoundary.getThreshold());
