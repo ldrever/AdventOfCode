@@ -3,9 +3,9 @@ import java.io.*;
 
 class Day16 {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		//ArrayList<Node> previousBoundary = new ArrayList<Node>();
-		boolean debug = false;
+		boolean debug = true;
 		boolean isPart1 = true;
 		int turnScore = 1000;
 		String filePath = debug ? "Y:\\code\\java\\AdventOfCode\\Day16small.dat" : "Y:\\code\\java\\AdventOfCode\\Day16input.dat";

@@ -75,10 +75,58 @@ public class Boundary {
 
 
 
-	public Boundary getNextBoundary(boolean debug, int turnScore, int nextThreshold) {
+	public Boundary getNextBoundary(boolean debug, int turnScore, int nextThreshold) throws Exception {
+
+
+		/*
+
+			Algorithm for finding a valid higher-threshold boundary, starting
+			off from an old, valid, lower-threshold one:
+
+			Initialization step
+			===================
+			*	Initialize HISTORY as the old boundary's
+				inside and LATEST as its outside.
+
+			Main loop
+			=========
+			*	Detect NEW as being all children of LATEST that are not
+				members of HISTORY or LATEST.
+
+			*	Ensure that NEW contains at most one way of entering a given
+				cell from a given direction - this being the cheapest of all
+				the possibilities.
+
+			*	Ensure likewise that if there is a node that enters some cell
+				in some direction in NEW, and there's another node doing the
+				same in HISTORY, that only the cheapest of the two is kept.
+
+			*	Extend the definition of HISTORY to include what had been
+				LATEST, then loop back and re-detect NEW.
+
+
+
+
+
+
+
+
+			1/	Identify a "layer" of child nodes of the lower-threshold
+				boundary's outside nodes. Ensure that none belong to the
+				lower boundary's outside or inside.
+
+			2/	Dedupe them so that there is a maximum of one node per cell,
+				and that the CHEAPEST such node is the one kept.
+
+
+		*/
+		this.outside.setFertility(true);
+		this.inside.setFertility(true);
+
 
 		NodeCollection latestLayer = this.outside.clone();
 		NodeCollection history = this.inside.clone();
+		boolean allowAncestorsAsChildren = false;
 
 		do {
 			// now in the standard state whereby:
@@ -86,7 +134,7 @@ public class Boundary {
 			// latest is populated, also assumed CHEAP-UNIQUE, and DISJOINT FROM HISTORY
 
 			// so we find the new layer...
-			NodeCollection newLayer = latestLayer.getGoodNeighbours(debug, turnScore, nextThreshold, history, false);
+			NodeCollection newLayer = latestLayer.getGoodNeighbours(debug, turnScore, nextThreshold, history, allowAncestorsAsChildren);
 
 
 
@@ -136,18 +184,32 @@ public class Boundary {
 		NodeCollection newOutside = history.getFinalOnes();
 		//System.out.println("only these should be over the threshold of " + nextThreshold + ": " + newOutside.toString());
 
-		NodeCollection hinterland = newOutside.getGoodNeighbours(debug, turnScore, Integer.MAX_VALUE, history, false);
+/*
+		NodeCollection hinterland = newOutside.getGoodNeighbours(debug, turnScore, Integer.MAX_VALUE, history, allowAncestorsAsChildren);
 		//System.out.println("hinterland: " + hinterland.toString());
 
 		// blem here bieng that inside'll have higher scores than outside...
 
 
+
+
 		// blem becuase findChildren won't pick up parents... couldn't we just GET their parents? or would some be missing FIXME
-		NodeCollection reversedInside = newOutside.getGoodNeighbours(debug, turnScore, Integer.MAX_VALUE, hinterland, true);
+		allowAncestorsAsChildren = true;
+		NodeCollection reversedInside = newOutside.getGoodNeighbours(debug, turnScore, Integer.MAX_VALUE, hinterland, allowAncestorsAsChildren);
 		//System.out.println("reversed inside: " + reversedInside.toString());
 
 		// ideally want to find everything in history that matches something in newInside...
 		NodeCollection newInside = history.getMatchingOnes(reversedInside);
+
+*/
+
+		NodeCollection newInside = newOutside.getParents();
+
+		// reassuring bit of verification
+		// System.out.print("RESULTS OF SCORE-CHECKS...");
+
+		if(newOutside.minScore(turnScore) < nextThreshold) throw new Exception("outside/inside threshold mismatch");
+		if(newInside.maxScore(turnScore) >= nextThreshold) throw new Exception("outside/inside threshold mismatch");
 
 		return new Boundary(newInside, newOutside, nextThreshold);
 

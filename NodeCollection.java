@@ -188,7 +188,58 @@ public class NodeCollection {
 
 
 
-	public NodeCollection getGoodNeighbours(boolean debug, int turnScore, int threshold, NodeCollection badNeighbours, boolean allowAncestorsAsChildren) {
+	public void setFertility(boolean fertility) {
+		ArrayList<Node> nodes = this.getNodes();
+		for(Node n : nodes) n.setFertility(fertility);
+	}
+
+
+
+	public NodeCollection getParents() {
+
+		ArrayList<Node> nodes = this.getNodes();
+		ArrayList<Node> parents = new ArrayList<>();
+
+		for(Node n : nodes) parents.add(n.getParent());
+
+		return new NodeCollection(parents);
+	}
+
+
+
+	public int minScore(int turnScore) {
+		int output = Integer.MAX_VALUE;
+
+		for(Node n : this.getNodes()) {
+			int nodeScore = n.getScore(turnScore);
+			if(nodeScore < output) output = nodeScore;
+		}
+
+		return output;
+	}
+
+
+
+	public int maxScore(int turnScore) {
+		int output = Integer.MIN_VALUE;
+
+		for(Node n : this.getNodes()) {
+			int nodeScore = n.getScore(turnScore);
+			if(nodeScore > output) output = nodeScore;
+		}
+
+		return output;
+	}
+
+
+
+	public NodeCollection getGoodNeighbours(
+	  boolean debug
+	, int turnScore
+	, int threshold
+	, NodeCollection badNeighbours
+	, boolean allowAncestorsAsChildren
+	) {
 		// find nodes that neighbour this collection, and which aren't PART of
 		// this collection; nor are they part of a known set of bad neighbours
 
