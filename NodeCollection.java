@@ -105,13 +105,17 @@ public class NodeCollection {
 			Node n1 = theseNodes.get(i);
 			int iRow = n1.getRow();
 			int iColumn = n1.getColumn();
+			int iDx = n1.getArrivalDx();
+			int iDy = n1.getArrivalDy();
 
 			for(int j = 0; j < otherNodes.size(); j++) {
 				Node n2 = otherNodes.get(j);
 				int jRow = n2.getRow();
 				int jColumn = n2.getColumn();
+				int jDx = n2.getArrivalDx();
+				int jDy = n2.getArrivalDy();
 
-				if(iRow == jRow && iColumn == jColumn) {
+				if(iRow == jRow && iColumn == jColumn & iDx == jDx && iDy == jDy) {
 					//if(debug) System.out.println("dupe detuct at (" + iRow + ", " + iColumn + ")");
 
 					if(n1.isCheaperThan(n2, turnScore)) {
@@ -142,14 +146,18 @@ public class NodeCollection {
 			Node n1 = this.nodes.get(i);
 			int iRow = n1.getRow();
 			int iColumn = n1.getColumn();
+			int iDx = n1.getArrivalDx();
+			int iDy = n1.getArrivalDy();
 
 			for(int j = i + 1; j < this.nodes.size(); j++) {
 
 				Node n2 = this.nodes.get(j);
 				int jRow = n2.getRow();
 				int jColumn = n2.getColumn();
+				int jDx = n2.getArrivalDx();
+				int jDy = n2.getArrivalDy();
 
-				if(iRow == jRow && iColumn == jColumn) {
+				if(iRow == jRow && iColumn == jColumn & iDx == jDx && iDy == jDy) {
 					if(debug) System.out.println("dupe detuct at (" + iRow + ", " + iColumn + ")");
 
 					if(n1.isCheaperThan(n2, turnScore)) {

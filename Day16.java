@@ -22,26 +22,61 @@ class Day16 {
 		Node origin = new Node(lg.getStartRow(), lg.getStartCol(), parent, lg, arrivalDy, arrivalDx);
 		System.out.println("origin scores " + origin.getScore(turnScore));
 
-		Boundary currentBoundary = new Boundary(debug, origin, turnScore);
-		System.out.println(currentBoundary.toString());
+		// small increments don't work with boundaries, so we need a three-boundary stack really:
 
-		int turnCount = 0;
+
+		int oldThreshold = 10333; /// FIXME hardcode
+		int veryOldThreshold = oldThreshold;
+		Boundary oldBoundary = new Boundary(debug, origin, turnScore);
+		Boundary veryOldBoundary = oldBoundary;
+		System.out.println(oldBoundary.toString());
+
+		//int turnCount = 0;
+
+		int upperBound = Integer.MAX_VALUE;
 
 		do {
-			turnCount++;
-			int nextThreshold = (turnScore / 2) + turnCount * turnScore;
+			//turnCount++;
+			int newThreshold = oldThreshold + 1001; // FIXME hardcode
 
-			currentBoundary = currentBoundary.getNextBoundary(debug, turnScore, nextThreshold);
+			Boundary newBoundary = oldBoundary.getNextBoundary(debug, turnScore, newThreshold);
 
-			if (currentBoundary.isEndCell()) {
-				System.out.println("detected final score of " + currentBoundary.getThreshold());
+			if (newBoundary.isEndCell()) {
+				System.out.println("detected LOWER BOUND of " + oldThreshold); // oldThreshold being the last such whose boundary didn't have the end-cell
+				upperBound = newBoundary.getThreshold();
+				System.out.println("detected UPPER BOUND of " + upperBound);
 				break;
+
 			} else {
-				System.out.println(currentBoundary.toString());
+
+				veryOldBoundary = oldBoundary;
+				oldBoundary = newBoundary;
+
+				veryOldThreshold = oldThreshold;
+				oldThreshold = newThreshold;
+
+				System.out.println(oldBoundary.toString());
 			}
 
-		} while(turnCount < 1_000_000);
+		} //while(turnCount < 1_000_000);
+			while(true);
 
+	int winningScore = upperBound;
+
+	System.out.println("Key boundary is that at " + veryOldBoundary.toString());
+
+	for(int threshold = upperBound; threshold > oldThreshold; threshold--) {
+
+		Boundary b = veryOldBoundary.getNextBoundary(debug, turnScore, threshold);
+
+		if(b.isEndCell()) {
+			int newScore = b.getThreshold();
+			if(newScore < winningScore) winningScore = newScore;
+		}
+
+	}
+
+			System.out.println("how hopefully answer is " + winningScore);
 
 	} // main method // FIXME - shouldn't exist!
 
