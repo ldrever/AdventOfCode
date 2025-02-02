@@ -25,7 +25,7 @@ class Day16 {
 		// small increments don't work with boundaries, so we need a three-boundary stack really:
 
 
-		int oldThreshold = 10333; /// FIXME hardcode
+		int oldThreshold = 5; /// FIXME hardcode
 		int veryOldThreshold = oldThreshold;
 		Boundary oldBoundary = new Boundary(debug, origin, turnScore);
 		Boundary veryOldBoundary = oldBoundary;
@@ -42,12 +42,16 @@ class Day16 {
 			Boundary newBoundary = oldBoundary.getNextBoundary(debug, turnScore, newThreshold);
 
 			if (newBoundary.isEndCell()) {
+			//if(newBoundary.hasEndCell(turnScore)) {
+				System.out.println("STOP! We know that " + newBoundary.getThreshold() + " can reach THE END-CELL!!!!!");
+
 				System.out.println("detected LOWER BOUND of " + oldThreshold); // oldThreshold being the last such whose boundary didn't have the end-cell
 				upperBound = newBoundary.getThreshold();
 				System.out.println("detected UPPER BOUND of " + upperBound);
 				break;
 
 			} else {
+				System.out.println("We know that the boundary with threshold " + newBoundary.getThreshold() + " does NOT include the end-cell");
 
 				veryOldBoundary = oldBoundary;
 				oldBoundary = newBoundary;
@@ -55,7 +59,7 @@ class Day16 {
 				veryOldThreshold = oldThreshold;
 				oldThreshold = newThreshold;
 
-				System.out.println(oldBoundary.toString());
+				//System.out.println(oldBoundary.toString());
 			}
 
 		} //while(turnCount < 1_000_000);
@@ -63,9 +67,9 @@ class Day16 {
 
 	int winningScore = upperBound;
 
-	System.out.println("Key boundary is that at " + veryOldBoundary.toString());
+	//System.out.println("Key boundary is that at " + veryOldBoundary.toString());
 
-	for(int threshold = upperBound; threshold > oldThreshold; threshold--) {
+	for(int threshold = upperBound; threshold > veryOldThreshold; threshold--) {
 
 		Boundary b = veryOldBoundary.getNextBoundary(debug, turnScore, threshold);
 

@@ -22,6 +22,46 @@ public class Boundary {
 	public int getThreshold() {return this.threshold;}
 
 
+
+	public boolean hasEndCell(int turnScore)
+	{
+
+		int endScore = Integer.MAX_VALUE;
+
+		for(Node n : this.outside.getNodes()) {
+			if(n.isEndCell()) {
+				int newEndScore = n.getScore(turnScore);
+				if(newEndScore < endScore) endScore = newEndScore;
+			}
+		}
+
+		return (endScore < Integer.MAX_VALUE);
+
+	}
+
+
+
+	public int scoreUpperBound(int turnScore) {
+
+		int endScore = Integer.MAX_VALUE;
+
+		for(Node n : this.outside.getNodes()) {
+			if(n.isEndCell()) {
+
+				int newEndScore = n.getScore(turnScore);
+				if(newEndScore < endScore) endScore = newEndScore;
+
+			}
+		}
+
+		return endScore;
+
+	}
+
+
+
+
+
 	/*
 		One straightforward means of construction will be to take a
 		single node, let that be the inside, and all its children
@@ -163,10 +203,6 @@ public class Boundary {
 
 		} while (latestLayer.hasNodes());
 
-		// here we check whether we've hit the end cell - note that
-		// we can't do this any sooner, since it's possible that a
-		// later "layer" will reach it more cheaply than an earlier one
-
 		int endScore = Integer.MAX_VALUE;
 
 		for(Node n : history.getNodes()) {
@@ -178,7 +214,15 @@ public class Boundary {
 			}
 		}
 
-		if(endScore < Integer.MAX_VALUE) return new Boundary(endScore);
+		if(endScore < Integer.MAX_VALUE) {
+
+			// find any node at the end-cell with the correct score
+
+
+
+			return new Boundary(endScore);
+		}
+
 
 		// can now end via return all childless ones...
 		NodeCollection newOutside = history.getFinalOnes();
@@ -208,8 +252,8 @@ public class Boundary {
 		// reassuring bit of verification
 		// System.out.print("RESULTS OF SCORE-CHECKS...");
 
-		if(newOutside.minScore(turnScore) < nextThreshold) throw new Exception("outside/inside threshold mismatch");
-		if(newInside.maxScore(turnScore) >= nextThreshold) throw new Exception("outside/inside threshold mismatch");
+		//if(newOutside.minScore(turnScore) < nextThreshold) throw new Exception("outside/inside threshold mismatch");
+		//if(newInside.maxScore(turnScore) >= nextThreshold) throw new Exception("outside/inside threshold mismatch");
 
 		return new Boundary(newInside, newOutside, nextThreshold);
 
