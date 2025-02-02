@@ -50,7 +50,7 @@ public class NodeCollection {
 		ArrayList<Node> output = new ArrayList<>();
 
 		for(Node n : allNodes) {
-			if(!n.getFertility()) {
+			if(!n.isFertile()) {
 				output.add(n);
 
 				// SET THEM BACK TO DEFAULTLY FERTILE!
@@ -233,36 +233,29 @@ public class NodeCollection {
 
 
 
-	public NodeCollection getGoodNeighbours(
+	public NodeCollection spawnFromSubThresholdNodes(
 	  boolean debug
 	, int turnScore
 	, int threshold
-	, NodeCollection badNeighbours
-	, boolean allowAncestorsAsChildren
+	, NodeCollection forbidden
 	) {
-		// find nodes that neighbour this collection, and which aren't PART of
-		// this collection; nor are they part of a known set of bad neighbours
 
 		ArrayList<Node> noGoZone = new ArrayList<>();
 		for(Node n : this.getNodes()) noGoZone.add(n);
-		for(Node n : badNeighbours.getNodes()) noGoZone.add(n);
+		for(Node n : forbidden.getNodes()) noGoZone.add(n);
 
 		ArrayList<Node> goodNeighbours = new ArrayList<>();
 
 		for(Node n : this.getNodes()) {
 
-			if(n.getFertility()) {
-				ArrayList<Node> nodeChildren = n.findChildren(debug, noGoZone, allowAncestorsAsChildren);
+			if(n.isFertile()) {
+				ArrayList<Node> nodeChildren = n.findChildren(debug, noGoZone);
 
 				for(Node child : nodeChildren) {
 
-					// when a node's score hits the threshold, stop
-					// spawning further nodes from it:
+					// ANY NODE THAT HITS THE THRESHOLD SHOULD BE INFERTILE
 					if(child.getScore(turnScore) >= threshold) {
 						child.setFertility(false);
-						//System.out.print(child.getCoords() + " scores ");
-						//System.out.print(child.getScore(turnScore));
-						//System.out.println(" hence is marked infertile");
 					}
 
 					goodNeighbours.add(child);

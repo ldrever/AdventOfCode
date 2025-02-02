@@ -166,7 +166,6 @@ public class Boundary {
 
 		NodeCollection latestLayer = this.outside.clone();
 		NodeCollection history = this.inside.clone();
-		boolean allowAncestorsAsChildren = false;
 
 		do {
 			// now in the standard state whereby:
@@ -174,7 +173,41 @@ public class Boundary {
 			// latest is populated, also assumed CHEAP-UNIQUE, and DISJOINT FROM HISTORY
 
 			// so we find the new layer...
-			NodeCollection newLayer = latestLayer.getGoodNeighbours(debug, turnScore, nextThreshold, history, allowAncestorsAsChildren);
+
+
+
+
+			/*
+				Here's how this works. Let's suppose we already have a valid
+				boundary - i.e., outside nodes that CAN'T be reached unless a
+				threshold is attained or exceeded, and inside nodes that are
+				their parents, and which score LESS than that threshold.
+
+				(Let's also stipulate that both these sets are non-empty.)
+
+				Starting from such a boundary, let's say that "layer zero" is
+				its outside. Then repeatedly do this:
+
+				-	find all children of those layer N nodes that haven't
+					already scored X; call these layer N+1
+
+				Stop once an empty "layer" is found.
+
+				Key things however:
+
+				-	An assumption is made that the old boundary can have no
+					nodes in common with the new one. In order to work with
+					that, we need to insist on the next boundary being a
+					turncost plus a stepcost higher than the previous one.
+
+				-	Under what conditions might it be possible that NO such
+					nodes can be found? Well, I think then, either return
+					the same input boundary, or construct a valid boundary
+					with the end-cell in its outside...
+
+
+			*/
+			NodeCollection newLayer = latestLayer.spawnFromSubThresholdNodes(debug, turnScore, nextThreshold, history);
 
 
 
@@ -229,7 +262,7 @@ public class Boundary {
 		//System.out.println("only these should be over the threshold of " + nextThreshold + ": " + newOutside.toString());
 
 /*
-		NodeCollection hinterland = newOutside.getGoodNeighbours(debug, turnScore, Integer.MAX_VALUE, history, allowAncestorsAsChildren);
+		NodeCollection hinterland = newOutside.spawnFromSubThresholdNodes(debug, turnScore, Integer.MAX_VALUE, history, allowAncestorsAsChildren);
 		//System.out.println("hinterland: " + hinterland.toString());
 
 		// blem here bieng that inside'll have higher scores than outside...
@@ -239,7 +272,7 @@ public class Boundary {
 
 		// blem becuase findChildren won't pick up parents... couldn't we just GET their parents? or would some be missing FIXME
 		allowAncestorsAsChildren = true;
-		NodeCollection reversedInside = newOutside.getGoodNeighbours(debug, turnScore, Integer.MAX_VALUE, hinterland, allowAncestorsAsChildren);
+		NodeCollection reversedInside = newOutside.spawnFromSubThresholdNodes(debug, turnScore, Integer.MAX_VALUE, hinterland, allowAncestorsAsChildren);
 		//System.out.println("reversed inside: " + reversedInside.toString());
 
 		// ideally want to find everything in history that matches something in newInside...

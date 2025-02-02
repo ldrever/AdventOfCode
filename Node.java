@@ -27,7 +27,7 @@ public class Node {
 	public int getStepCount() {return this.stepCount;}
 	public int getArrivalDy() {return this.arrivalDy;}
 	public int getArrivalDx() {return this.arrivalDx;}
-	public boolean getFertility() {return this.isFertile;}
+	public boolean isFertile() {return this.isFertile;}
 
 
 	public int getScore(int turnScore) {return this.stepCount + turnScore * this.turnCount;}
