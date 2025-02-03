@@ -236,6 +236,7 @@ public class Boundary {
 
 		} while (latestLayer.hasNodes());
 
+/*
 		int endScore = Integer.MAX_VALUE;
 
 		for(Node n : history.getNodes()) {
@@ -256,9 +257,26 @@ public class Boundary {
 			return new Boundary(endScore);
 		}
 
+*/
 
 		// can now end via return all childless ones...
 		NodeCollection newOutside = history.getFinalOnes();
+
+
+		ArrayList<Node> results = history.getFinalOnes().getNodes();
+
+		if(results.size() == 0) {
+			// so we failed to hit the threshold - send THIS signal:
+			return this;
+
+		} else {
+			NodeCollection newInside = newOutside.getParents();
+			return new Boundary(newInside, newOutside, nextThreshold);
+
+		}
+
+
+
 		//System.out.println("only these should be over the threshold of " + nextThreshold + ": " + newOutside.toString());
 
 /*
@@ -280,7 +298,7 @@ public class Boundary {
 
 */
 
-		NodeCollection newInside = newOutside.getParents();
+
 
 		// reassuring bit of verification
 		// System.out.print("RESULTS OF SCORE-CHECKS...");
@@ -288,7 +306,7 @@ public class Boundary {
 		//if(newOutside.minScore(turnScore) < nextThreshold) throw new Exception("outside/inside threshold mismatch");
 		//if(newInside.maxScore(turnScore) >= nextThreshold) throw new Exception("outside/inside threshold mismatch");
 
-		return new Boundary(newInside, newOutside, nextThreshold);
+
 
 	}
 

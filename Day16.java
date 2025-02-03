@@ -25,22 +25,69 @@ class Day16 {
 		// small increments don't work with boundaries, so we need a three-boundary stack really:
 
 
-		int oldThreshold = 5; /// FIXME hardcode
-		int veryOldThreshold = oldThreshold;
 		Boundary oldBoundary = new Boundary(debug, origin, turnScore);
-		Boundary veryOldBoundary = oldBoundary;
+		int oldThreshold = oldBoundary.getThreshold();
+
+		Boundary baselineBoundary = oldBoundary;
+		int baselineThreshold = oldThreshold;
+
+
 		System.out.println(oldBoundary.toString());
 
 		//int turnCount = 0;
 
 		int upperBound = Integer.MAX_VALUE;
+		int lowerBound = 0;
+
+
+		/*
+			Objective for this next part is going to be:
+
+			-	Identify an upper bound for the cost of reaching the end-cell
+				(because an earlier boundary could conceivably reach it before,
+				and less cheaply than, a later boundary)
+
+			-	Identify a lower bound for the cost of reaching the end-cell
+				(simply by adding one to the last controlled boundary
+				threshold - we know that THAT can't reach the end-cell).
+
+			-	Identify the baseline boundary that we will use to track down
+				the TRUE boundary - it must be sufficiently far below both
+				the upper AND LOWER bounds.
+
+		*/
 
 		do {
-			//turnCount++;
+			baselineThreshold = oldThreshold;
+			baselineBoundary = oldBoundary;
+			System.out.println(oldThreshold);
 			int newThreshold = oldThreshold + 1001; // FIXME hardcode
-
 			Boundary newBoundary = oldBoundary.getNextBoundary(debug, turnScore, newThreshold);
 
+			if(newBoundary.getThreshold() == oldBoundary.getThreshold() ) {
+				// means nothing could be found requiring THAT big a threshold
+				System.out.println("No nodes findable costing " + newThreshold);
+				upperBound = oldBoundary.getThreshold() + 1001;
+				break;
+			}
+
+			if(newBoundary.hasEndCell(turnScore)) {
+				// means the end-cell is findable by THAT boundary, but maybe by some lower ones too
+				System.out.println("End-cell detected!");
+				upperBound = newBoundary.getThreshold();
+				break;
+			}
+
+			System.out.println("We know that the boundary with threshold " + newBoundary.getThreshold() + " does NOT include the end-cell");
+
+			lowerBound = newBoundary.getThreshold() + 1;
+
+			oldBoundary = newBoundary;
+			oldThreshold = newThreshold;
+
+		} while(true);
+
+/*
 			if (newBoundary.isEndCell()) {
 			//if(newBoundary.hasEndCell(turnScore)) {
 				System.out.println("STOP! We know that " + newBoundary.getThreshold() + " can reach THE END-CELL!!!!!");
@@ -53,10 +100,10 @@ class Day16 {
 			} else {
 				System.out.println("We know that the boundary with threshold " + newBoundary.getThreshold() + " does NOT include the end-cell");
 
-				veryOldBoundary = oldBoundary;
+				baselineBoundary = oldBoundary;
 				oldBoundary = newBoundary;
 
-				veryOldThreshold = oldThreshold;
+				baselineThreshold = oldThreshold;
 				oldThreshold = newThreshold;
 
 				//System.out.println(oldBoundary.toString());
@@ -64,16 +111,17 @@ class Day16 {
 
 		} //while(turnCount < 1_000_000);
 			while(true);
+*/
 
 	int winningScore = upperBound;
 
-	//System.out.println("Key boundary is that at " + veryOldBoundary.toString());
+	//System.out.println("Key boundary is that at " + baselineBoundary.toString());
 
-	for(int threshold = upperBound; threshold > veryOldThreshold; threshold--) {
+	for(int threshold = upperBound; threshold >= lowerBound; threshold--) {
 
-		Boundary b = veryOldBoundary.getNextBoundary(debug, turnScore, threshold);
+		Boundary b = baselineBoundary.getNextBoundary(debug, turnScore, threshold);
 
-		if(b.isEndCell()) {
+		if(b.hasEndCell(turnScore)) {
 			int newScore = b.getThreshold();
 			if(newScore < winningScore) winningScore = newScore;
 		}
